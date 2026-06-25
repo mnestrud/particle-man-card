@@ -280,6 +280,9 @@ export interface MockHassOptions {
   use12HourClock?: boolean;
   language?: string;
   supportedFeatures?: number;
+  rejectForecastSubscribe?: boolean;
+  rejectForecastUnsubscribe?: boolean;
+  connected?: boolean;
 }
 
 export class MockHass {
@@ -290,6 +293,11 @@ export class MockHass {
       forecastType: ForecastSubscriptionType;
     }
   >();
+  private subscribeCallCounts: Record<ForecastSubscriptionType, number> = {
+    hourly: 0,
+    daily: 0,
+    twice_daily: 0,
+  };
   public hourlyForecast: ForecastAttribute[] = [];
   public dailyForecast: ForecastAttribute[] = [];
   public twiceDailyForecast: ForecastAttribute[] = [];
@@ -302,6 +310,7 @@ export class MockHass {
         unitOfMeasurement: "°C",
         darkMode: true,
         supportedFeatures: 3, // FORECAST_DAILY | FORECAST_HOURLY
+        connected: true,
       },
       options
     );
@@ -328,10 +337,26 @@ export class MockHass {
     this.options.currentCondition = condition;
   }
 
+  setConnected(connected: boolean) {
+    this.options.connected = connected;
+  }
+
+  getSubscribeCallCount(type?: ForecastSubscriptionType): number {
+    if (type) {
+      return this.subscribeCallCounts[type];
+    }
+
+    return Object.values(this.subscribeCallCounts).reduce(
+      (sum, count) => sum + count,
+      0
+    );
+  }
+
   getHass(): MockHomeAssistant {
     const currentForecast = this.hourlyForecast[0];
 
     return {
+      connected: this.options.connected ?? true,
       themes: {
         darkMode: this.options.darkMode || true,
       },
@@ -655,6 +680,14 @@ export class MockHass {
           message: { forecast_type: ForecastSubscriptionType }
         ) => {
           console.log("Mock forecast subscription:", message);
+          this.subscribeCallCounts[message.forecast_type] += 1;
+
+          if (this.options.rejectForecastSubscribe) {
+            return Promise.reject({
+              code: "not_found",
+              message: "Subscription not found.",
+            });
+          }
 
           // Store subscription with forecast type
           const subscriptionId = crypto.randomUUID();
@@ -685,10 +718,16 @@ export class MockHass {
 
           setTimeout(() => callback(forecastEvent), 100);
 
-          return () => {
+          return Promise.resolve(() => {
             this.subscriptions.delete(subscriptionId);
+            if (this.options.rejectForecastUnsubscribe) {
+              return Promise.reject({
+                code: "not_found",
+                message: "Subscription not found.",
+              });
+            }
             console.log("Mock forecast unsubscribed");
-          };
+          });
         },
       },
     };
