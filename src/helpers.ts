@@ -2,7 +2,11 @@ import { HomeAssistant, TimeFormat } from "custom-card-helpers";
 import { STATE_NOT_RUNNING } from "home-assistant-js-websocket";
 import * as SunCalc from "suncalc";
 import memoizeOne from "memoize-one";
-import { SuntimesInfo } from "./types";
+import {
+  CurrentWeatherAttributeConfig,
+  SuntimesInfo,
+  WeatherForecastCardConfig,
+} from "./types";
 
 export interface HourParts {
   hour: string;
@@ -286,4 +290,61 @@ export const endOfHour = (input: Date | string): Date => {
   d.setMinutes(59, 59, 999);
 
   return d;
+};
+
+const entityOf = (item: unknown): string | undefined => {
+  const entity =
+    item != null && typeof item === "object"
+      ? (item as CurrentWeatherAttributeConfig).entity
+      : undefined;
+
+  return typeof entity === "string" ? entity : undefined;
+};
+
+/**
+ * Collects the entity ids the current-weather section reads from `hass.states`
+ * beyond the primary weather entity: the temperature sensor, the secondary info
+ * entity and any custom entities used in `show_attributes`. Used to keep the
+ * card reactive to those sensors (see `shouldUpdate`); the primary `entity` is
+ * intentionally excluded because `hasConfigOrEntityChanged` already tracks it.
+ */
+export const getReferencedCurrentEntities = (
+  config: WeatherForecastCardConfig
+): string[] => {
+  const current = config.current;
+  if (!current) {
+    return [];
+  }
+
+  const ids = new Set<string>();
+
+  if (current.temperature_entity) {
+    ids.add(current.temperature_entity);
+  }
+
+  const secondaryEntity = entityOf(current.secondary_info_attribute);
+  if (secondaryEntity) {
+    ids.add(secondaryEntity);
+  }
+
+  const showAttr = current.show_attributes;
+  if (Array.isArray(showAttr)) {
+    for (const item of showAttr) {
+      const entity = entityOf(item);
+      if (entity) {
+        ids.add(entity);
+      }
+    }
+  } else {
+    const entity = entityOf(showAttr);
+    if (entity) {
+      ids.add(entity);
+    }
+  }
+
+  // The primary entity is tracked separately by hasConfigOrEntityChanged; drop it
+  // if a current-section entity happens to point at the same id.
+  ids.delete(config.entity);
+
+  return [...ids];
 };
