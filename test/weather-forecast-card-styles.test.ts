@@ -304,6 +304,39 @@ describe("weather-forecast-card theme variables", () => {
     });
   });
 
+  describe("cloud text-shadow theming", () => {
+    it("should apply the primary text-shadow only in dark theme", () => {
+      for (const target of [".wfc-current-state", ".wfc-current-temperature"]) {
+        expect(cssContent).toContain(
+          `wfc-animation-provider.dark[has-clouds] ~ .wfc-container ${target}`
+        );
+        expect(cssContent).not.toContain(
+          `wfc-animation-provider[has-clouds] ~ .wfc-container ${target}`
+        );
+      }
+    });
+
+    it("should apply the secondary text-shadow only in dark theme", () => {
+      for (const target of [".wfc-name", ".wfc-current-secondary-value"]) {
+        expect(cssContent).toContain(
+          `wfc-animation-provider.dark[has-clouds] ~ .wfc-container ${target}`
+        );
+        expect(cssContent).not.toContain(
+          `wfc-animation-provider[has-clouds] ~ .wfc-container ${target}`
+        );
+      }
+    });
+
+    it("should apply the secondary icon drop-shadow only in dark theme", () => {
+      expect(cssContent).toContain(
+        "wfc-animation-provider.dark[has-clouds] ~ .wfc-container .wfc-current-secondary-icon"
+      );
+      expect(cssContent).not.toContain(
+        "wfc-animation-provider[has-clouds] ~ .wfc-container .wfc-current-secondary-icon"
+      );
+    });
+  });
+
   describe("all theme variables coverage", () => {
     it("should test all 17 main theme variables in CSS file", () => {
       const allMainVariables = [
