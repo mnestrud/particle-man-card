@@ -129,8 +129,16 @@ export interface WeatherForecastCardForecastActionConfig {
   double_tap_action?: ForecastActionConfig;
 }
 
+/** Panel backed by a device's sensors, located via one anchor entity. */
+export interface DiscoveredPanelConfig {
+  /** Any sensor belonging to the target device; siblings are enumerated. */
+  anchor_entity: string;
+}
+
 export interface WeatherForecastCardConfig {
   type: "custom:particle-man-card";
+  air_quality?: DiscoveredPanelConfig;
+  pollen?: DiscoveredPanelConfig;
   entity: string;
   name?: string;
   /** @deprecated Use `current.temperature_entity` instead */

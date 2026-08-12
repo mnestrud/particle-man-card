@@ -897,7 +897,9 @@ export class WeatherAnimationProvider extends LitElement {
     const speedFactor =
       Math.min(speedMS, WIND_SPEED_MS_MAX) / WIND_SPEED_MS_MAX;
 
-    const radians = (forecast.wind_bearing * Math.PI) / 180;
+    // wind_bearing is number | string in the Forecast type; coerce so tsc
+    // accepts the arithmetic (upstream never ran tsc --noEmit).
+    const radians = (Number(forecast.wind_bearing) * Math.PI) / 180;
     const directionFactor = Math.sin(radians);
     const curve = isRain ? 0.8 : 0.5;
     const adjustedSpeed = Math.pow(speedFactor, curve);

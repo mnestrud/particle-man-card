@@ -6,6 +6,11 @@ import {
   getReferencedCurrentEntities,
   normalizeDate,
 } from "./helpers";
+import {
+  DiscoveryResult,
+  EntityWatchSet,
+  discoverDeviceEntities,
+} from "./data/entity-discovery";
 import { logger } from "./logger";
 import {
   actionHandler,
@@ -87,6 +92,16 @@ export class WeatherForecastCard extends LitElement {
   @state() private _currentItemWidth!: number;
   @state() private _currentForecastType: ForecastType = "daily";
   @state() private _isScrollable = false;
+  @state() private _discovery: Record<string, DiscoveryResult> = {};
+
+  /**
+   * Every non-weather entity the card renders, statically configured or
+   * discovered. shouldUpdate consults this on each hass mutation, so panels
+   * backed by plain sensors re-render when their sources change instead of
+   * freezing at first paint.
+   */
+  private watchSet = new EntityWatchSet();
+  private discoveryStarted = new Set<string>();
   @query("ha-card") private _haCard?: HTMLElement;
   @query(".wfc-forecast-container") private _forecastContainer?: HTMLElement;
 
@@ -180,6 +195,54 @@ export class WeatherForecastCard extends LitElement {
 
     this.config = merge({}, DEFAULT_CONFIG, migratedConfig);
     this._currentForecastType = this.config.default_forecast || "daily";
+
+    // Anchors may have changed, so previous discovery no longer applies.
+    this.watchSet = new EntityWatchSet();
+    this.watchSet.setStatic(getReferencedCurrentEntities(this.config));
+    this.discoveryStarted = new Set();
+    this._discovery = {};
+  }
+
+  /**
+   * Anchor entities for panels that enumerate a device's sensors. Populated by
+   * panel config (air_quality/pollen) as those land; the discovery lifecycle
+   * is anchored here so panels only ever read `_discovery`.
+   */
+  private discoveryAnchors(): Record<string, string> {
+    const anchors: Record<string, string> = {};
+    const aq = this.config?.air_quality?.anchor_entity;
+    if (aq) {
+      anchors.air_quality = aq;
+    }
+    const pollen = this.config?.pollen?.anchor_entity;
+    if (pollen) {
+      anchors.pollen = pollen;
+    }
+    return anchors;
+  }
+
+  private maybeStartDiscovery(): void {
+    if (!this.hass) {
+      return;
+    }
+    for (const [group, anchor] of Object.entries(this.discoveryAnchors())) {
+      if (this.discoveryStarted.has(group)) {
+        continue;
+      }
+      this.discoveryStarted.add(group);
+      discoverDeviceEntities(this.hass, anchor).then((result) => {
+        // A setConfig while the call was in flight replaced discoveryStarted;
+        // stale results must not repopulate the new watch set.
+        if (!this.discoveryStarted.has(group)) {
+          return;
+        }
+        this.watchSet.setDiscovered(
+          group,
+          result.entities.map((e) => e.entityId)
+        );
+        this._discovery = { ...this._discovery, [group]: result };
+      });
+    }
   }
 
   /**
@@ -300,6 +363,7 @@ export class WeatherForecastCard extends LitElement {
     return (
       hasConfigOrEntityChanged(this, changedProperties, false) ||
       this.hasReferencedCurrentEntityChanged(changedProperties) ||
+      changedProperties.has("_discovery") ||
       changedProperties.has("_dailyForecastEvent") ||
       changedProperties.has("_hourlyForecastEvent") ||
       changedProperties.has("_currentForecastType") ||
@@ -322,6 +386,8 @@ export class WeatherForecastCard extends LitElement {
     if (this.haveForecastSubscriptionInputsChanged(changedProps)) {
       this._subscribed = false;
     }
+
+    this.maybeStartDiscovery();
 
     // Skip while the page is hidden: a hass update arriving in a backgrounded
     // tab must not re-open subscriptions we deliberately suspended.
@@ -1039,11 +1105,10 @@ export class WeatherForecastCard extends LitElement {
     }
 
     // hasConfigOrEntityChanged only tracks the primary weather entity, but the
-    // current section can also read custom sensors (temperature_entity,
-    // secondary info, show_attributes). React when any of those change too.
-    return getReferencedCurrentEntities(this.config).some(
-      (entityId) => oldHass.states[entityId] !== newHass.states[entityId]
-    );
+    // card also reads custom sensors (temperature_entity, secondary info,
+    // show_attributes) and whatever the discovery layer found for the
+    // air-quality and pollen panels. React when any of those change too.
+    return this.watchSet.anyChanged(oldHass.states, newHass.states);
   }
 
   private onForecastAction = (event: ForecastActionEvent): void => {

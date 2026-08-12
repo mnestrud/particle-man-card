@@ -36,7 +36,8 @@
     "demo": "parcel serve demo/index.html demo/background.png",
     "lint": "eslint 'src/**/*.ts'",
     "test": "vitest run",
-    "test:watch": "vitest watch"
+    "test:watch": "vitest watch",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "chart.js": "4.5.1",
