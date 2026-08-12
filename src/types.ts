@@ -129,6 +129,18 @@ export interface WeatherForecastCardForecastActionConfig {
   double_tap_action?: ForecastActionConfig;
 }
 
+/** Minute-forecast strip below the current-weather section. */
+export interface NowcastConfig {
+  /**
+   * Weather entity whose integration provides get_minute_forecast, or a
+   * sensor exposing the segments as an attribute. Defaults to the card's
+   * main weather entity.
+   */
+  entity?: string;
+  /** Keep the strip visible even when nothing is expected. */
+  always_show?: boolean;
+}
+
 /** Panel backed by a device's sensors, located via one anchor entity. */
 export interface DiscoveredPanelConfig {
   /** Any sensor belonging to the target device; siblings are enumerated. */
@@ -139,6 +151,7 @@ export interface WeatherForecastCardConfig {
   type: "custom:particle-man-card";
   air_quality?: DiscoveredPanelConfig;
   pollen?: DiscoveredPanelConfig;
+  nowcast?: NowcastConfig;
   entity: string;
   name?: string;
   /** @deprecated Use `current.temperature_entity` instead */

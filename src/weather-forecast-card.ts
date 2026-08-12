@@ -454,6 +454,13 @@ export class WeatherForecastCard extends LitElement {
                 ></wfc-current-weather>
               </div>`
             : nothing}
+          ${this.config.nowcast
+            ? html`<wfc-nowcast
+                .hass=${this.hass}
+                .entityId=${this.config.nowcast.entity ?? this.config.entity}
+                .alwaysShow=${this.config.nowcast.always_show ?? false}
+              ></wfc-nowcast>`
+            : nothing}
           ${this.config.show_forecast === false
             ? nothing
             : html`<div class="wfc-forecast-container">

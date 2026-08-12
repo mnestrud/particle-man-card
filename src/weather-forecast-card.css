@@ -667,3 +667,28 @@ wfc-weather-condition-icon-provider {
     font-size: var(--ha-font-size-xl, 20px);
   }
 }
+
+/* --- Nowcast strip (wfc-nowcast) ----------------------------------------- */
+
+.wfc-nowcast {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ha-space-1, 4px);
+  margin-top: var(--ha-space-2, 8px);
+}
+
+.wfc-nowcast-headline {
+  font-size: var(--ha-font-size-s, 12px);
+  color: var(--secondary-text-color);
+}
+
+.wfc-nowcast-chart {
+  position: relative;
+  height: var(--wfc-nowcast-height, 64px);
+  width: 100%;
+}
+
+.wfc-nowcast-chart canvas {
+  position: absolute;
+  inset: 0;
+}
