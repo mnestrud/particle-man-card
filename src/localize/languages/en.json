@@ -1,0 +1,53 @@
+{
+  "nowcast": {
+    "title": "Precipitation",
+    "now": "Now",
+    "none_expected": "No precipitation expected in the next {hours} hours",
+    "starts_in": "{type} starting in {minutes} min",
+    "ends_in": "{type} ending in {minutes} min",
+    "unavailable": "Nowcast unavailable",
+    "type": {
+      "RAIN": "Rain",
+      "SNOW": "Snow",
+      "HAIL": "Hail",
+      "NONE": "Precipitation"
+    }
+  },
+  "alerts": {
+    "title": "Weather Alerts",
+    "none": "No active alerts",
+    "count": "{count} active alert",
+    "count_plural": "{count} active alerts",
+    "severity": {
+      "MINOR": "Minor",
+      "MODERATE": "Moderate",
+      "SEVERE": "Severe",
+      "EXTREME": "Extreme"
+    },
+    "until": "until",
+    "instructions": "Instructions"
+  },
+  "air_quality": {
+    "title": "Air Quality",
+    "aqi": "AQI",
+    "dominant": "Main pollutant",
+    "health": "Health recommendations",
+    "pollutants": "Pollutants"
+  },
+  "pollen": {
+    "title": "Pollen",
+    "in_season": "In season",
+    "out_of_season": "Out of season",
+    "dominant": "Highest",
+    "plants": "Plants",
+    "family": "Family",
+    "genus": "Genus",
+    "season": "Season",
+    "cross_reaction": "Cross-reactions",
+    "no_data": "No pollen data"
+  },
+  "panel": {
+    "no_entities": "No matching sensors found",
+    "discovering": "Finding sensors…"
+  }
+}
