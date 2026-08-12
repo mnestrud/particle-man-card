@@ -59,7 +59,7 @@ import "./components/wfc-current-weather";
 import "./components/animation/wfc-animation-provider";
 
 const DEFAULT_CONFIG: Partial<WeatherForecastCardConfig> = {
-  type: "custom:weather-forecast-card",
+  type: "custom:particle-man-card",
   show_current: true,
   show_forecast: true,
   default_forecast: "daily",
@@ -106,7 +106,7 @@ export class WeatherForecastCard extends LitElement {
   static styles = styles as CSSResultGroup;
 
   public static async getConfigElement() {
-    return document.createElement("weather-forecast-card-editor");
+    return document.createElement("particle-man-card-editor");
   }
 
   public static getStubConfig(

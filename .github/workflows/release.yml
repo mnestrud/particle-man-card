@@ -81,7 +81,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version_check.outputs.VERSION }}
-          files: dist/weather-forecast-card.js
+          files: dist/particle-man-card.js
           generate_release_notes: true
           prerelease: ${{ steps.version_check.outputs.IS_PRERELEASE == 'true' }}
 

@@ -5,7 +5,7 @@ import { WeatherForecastCardConfig } from "../src/types";
 const baseConfig = (
   current: WeatherForecastCardConfig["current"]
 ): WeatherForecastCardConfig => ({
-  type: "custom:weather-forecast-card",
+  type: "custom:particle-man-card",
   entity: "weather.demo",
   current,
 });
@@ -14,7 +14,7 @@ describe("getReferencedCurrentEntities", () => {
   it("returns nothing when there is no current section", () => {
     expect(
       getReferencedCurrentEntities({
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
       })
     ).toEqual([]);

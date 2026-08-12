@@ -130,7 +130,7 @@ export interface WeatherForecastCardForecastActionConfig {
 }
 
 export interface WeatherForecastCardConfig {
-  type: "custom:weather-forecast-card";
+  type: "custom:particle-man-card";
   entity: string;
   name?: string;
   /** @deprecated Use `current.temperature_entity` instead */

@@ -1,6 +1,6 @@
 {
-  "name": "Weather Forecast Card",
+  "name": "Particle Man Card",
   "render_readme": true,
-  "filename": "weather-forecast-card.js",
+  "filename": "particle-man-card.js",
   "content_in_root": false
 }

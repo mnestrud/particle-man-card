@@ -378,7 +378,7 @@
           </div>
         </div>
         <div class="demo-card-container">
-          <weather-forecast-card class="demo-card"></weather-forecast-card>
+          <particle-man-card class="demo-card"></particle-man-card>
         </div>
         <div class="tap-indicator" id="tap-indicator"></div>
         <div class="scroll-indicator" id="scroll-indicator">
@@ -424,11 +424,11 @@
         updateTheme();
       });
 
-      customElements.whenDefined("weather-forecast-card").then(() => {
+      customElements.whenDefined("particle-man-card").then(() => {
         const card = document.querySelector(".demo-card");
 
         card.setConfig({
-          type: "custom:weather-forecast-card",
+          type: "custom:particle-man-card",
           entity: "weather.demo",
           name: "Home",
           show_condition_effects: false,

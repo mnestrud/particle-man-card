@@ -265,7 +265,7 @@ describe("weather-forecast-card-animations", () => {
       const hass = mockHass.getHass() as ExtendedHomeAssistant;
       const entity = hass.states["weather.demo"] as WeatherEntity;
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         show_condition_effects: true,
         forecast: { show_sun_times: false },
@@ -301,7 +301,7 @@ describe("weather-forecast-card-animations", () => {
       const hass = mockHass.getHass() as ExtendedHomeAssistant;
       const entity = hass.states["weather.demo"] as WeatherEntity;
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         show_condition_effects: true,
         forecast: { show_sun_times: false },
@@ -344,7 +344,7 @@ describe("weather-forecast-card-animations", () => {
       const hass = mockHass.getHass() as ExtendedHomeAssistant;
       const entity = hass.states["weather.demo"] as WeatherEntity;
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         show_condition_effects: true,
         forecast: { show_sun_times: false },
@@ -396,7 +396,7 @@ const createFixture = async (
   const mockHass = new MockHass({ currentCondition: condition });
   const hass = mockHass.getHass() as ExtendedHomeAssistant;
   const config: WeatherForecastCardConfig = {
-    type: "custom:weather-forecast-card",
+    type: "custom:particle-man-card",
     entity: "weather.demo",
     show_condition_effects: showConditionEffects,
     forecast: {
@@ -406,10 +406,10 @@ const createFixture = async (
   };
 
   const element = await fixture<WeatherForecastCard>(
-    html`<weather-forecast-card
+    html`<particle-man-card
       .hass=${hass}
       .config=${config}
-    ></weather-forecast-card>`
+    ></particle-man-card>`
   );
 
   element.setConfig(config);

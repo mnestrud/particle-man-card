@@ -18,7 +18,7 @@ const workedExampleShowAttributes = [
 ];
 
 const workedExampleConfig = {
-  type: "custom:weather-forecast-card" as const,
+  type: "custom:particle-man-card" as const,
   entity: "weather.demo",
   current: {
     show_attributes: workedExampleShowAttributes,
@@ -135,7 +135,7 @@ describe("denormalizeConfig", () => {
 
   it("expands true to all 10 known attributes", () => {
     const form = denormalizeConfig({
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       current: { show_attributes: true },
     });
@@ -146,7 +146,7 @@ describe("denormalizeConfig", () => {
 
   it("flattens current.attributes_layout onto the form", () => {
     const form = denormalizeConfig({
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       current: {
         show_attributes: ["humidity"],

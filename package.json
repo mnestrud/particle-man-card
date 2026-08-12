@@ -1,7 +1,7 @@
 {
-  "name": "weather-forecast-card",
+  "name": "particle-man-card",
   "version": "1.2.0-devel",
-  "description": "A TypeScript weather forecast card built with Parcel",
+  "description": "All-in-one Home Assistant card for Particle Man: weather, nowcast, air quality and pollen",
   "browserslist": "ios >= 15, safari >= 15, last 2 versions, not dead",
   "author": "troinine",
   "license": "MIT",
@@ -10,12 +10,13 @@
     "home-assistant",
     "weather-forecast",
     "weather-card",
-    "weather-forecast-card",
+    "particle-man-card",
     "home-assistant-frontend",
-    "custom-card"
+    "custom-card",
+    "particle-man"
   ],
   "type": "module",
-  "module": "dist/weather-forecast-card.js",
+  "module": "dist/particle-man-card.js",
   "targets": {
     "module": {
       "distDir": "./dist",
@@ -23,7 +24,7 @@
         "src/index.ts"
       ],
       "optimize": true,
-      "publicUrl": "/hacsfiles/ha-weather-forecast-card/",
+      "publicUrl": "/hacsfiles/particle-man-card/",
       "includeNodeModules": true
     }
   },

@@ -49,115 +49,115 @@
       <h2>Weather Forecast Card test</h2>
       <h3>With current weather</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-1"></weather-forecast-card>
+        <particle-man-card id="test-card-1"></particle-man-card>
       </div>
       <h3>Without current weather</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-2"></weather-forecast-card>
+        <particle-man-card id="test-card-2"></particle-man-card>
       </div>
       <h3>Custom icons</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-3"></weather-forecast-card>
+        <particle-man-card id="test-card-3"></particle-man-card>
       </div>
       <h3>Custom temperature entity</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-4"></weather-forecast-card>
+        <particle-man-card id="test-card-4"></particle-man-card>
       </div>
       <h3>Chart mode</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-5"></weather-forecast-card>
+        <particle-man-card id="test-card-5"></particle-man-card>
       </div>
       <h3>Aggregated hourly data</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-6"></weather-forecast-card>
+        <particle-man-card id="test-card-6"></particle-man-card>
       </div>
       <h3>Animated background</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-7"></weather-forecast-card>
+        <particle-man-card id="test-card-7"></particle-man-card>
       </div>
       <h3>Animated background (dark)</h3>
       <div class="test-card dark">
-        <weather-forecast-card id="test-card-8"></weather-forecast-card>
+        <particle-man-card id="test-card-8"></particle-man-card>
       </div>
       <h3>Weather attributes</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-9"></weather-forecast-card>
+        <particle-man-card id="test-card-9"></particle-man-card>
       </div>
       <h3>Color thresholds</h3>
       <div class="test-card">
-        <weather-forecast-card
+        <particle-man-card
           id="test-card-color-thresholds"
-        ></weather-forecast-card>
+        ></particle-man-card>
       </div>
       <h3>Color thresholds (Fahrenheit)</h3>
       <div class="test-card">
-        <weather-forecast-card
+        <particle-man-card
           id="test-card-color-thresholds-fahrenheit"
-        ></weather-forecast-card>
+        ></particle-man-card>
       </div>
       <h3>Cardinal wind bearing</h3>
       <div class="test-card">
-        <weather-forecast-card
+        <particle-man-card
           id="test-card-cardinal-wind"
-        ></weather-forecast-card>
+        ></particle-man-card>
       </div>
       <h3>Secondary info attribute</h3>
       <div class="test-card">
-        <weather-forecast-card
+        <particle-man-card
           id="test-card-secondary-info-attribute"
-        ></weather-forecast-card>
+        ></particle-man-card>
       </div>
       <h3>12-hour clock</h3>
       <div class="test-card">
-        <weather-forecast-card
+        <particle-man-card
           id="test-card-12-hour-clock"
-        ></weather-forecast-card>
+        ></particle-man-card>
       </div>
       <h3>12-hour clock, chart mode</h3>
       <div class="test-card">
-        <weather-forecast-card
+        <particle-man-card
           id="test-card-12-hour-clock-chart-mode"
-        ></weather-forecast-card>
+        ></particle-man-card>
       </div>
       <h3>Twice daily, simple</h3>
       <div class="test-card">
-        <weather-forecast-card
+        <particle-man-card
           id="test-card-twice-daily-simple"
-        ></weather-forecast-card>
+        ></particle-man-card>
       </div>
       <h3>Twice daily, chart</h3>
       <div class="test-card">
-        <weather-forecast-card
+        <particle-man-card
           id="test-card-twice-daily-chart"
-        ></weather-forecast-card>
+        ></particle-man-card>
       </div>
       <h2>Bug fixes</h2>
       <h3>#14</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-bug-14"></weather-forecast-card>
+        <particle-man-card id="test-card-bug-14"></particle-man-card>
       </div>
       <h3>#14 - 2</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-bug-14-2"></weather-forecast-card>
+        <particle-man-card id="test-card-bug-14-2"></particle-man-card>
       </div>
       <h3>#139 - 1 (issue body — chart font 15px, 14° out of bounds)</h3>
       <div class="test-card">
-        <weather-forecast-card
+        <particle-man-card
           id="test-card-bug-139"
           style="--weather-forecast-card-chart-font-size: 15px"
-        ></weather-forecast-card>
+        ></particle-man-card>
       </div>
       <h3>#139 - 2 (DWD comment)</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-bug-139-2"></weather-forecast-card>
+        <particle-man-card id="test-card-bug-139-2"></particle-man-card>
       </div>
       <h3>#139 - 3 (screenshot report, 6 days)</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-bug-139-3"></weather-forecast-card>
+        <particle-man-card id="test-card-bug-139-3"></particle-man-card>
       </div>
       <h3>#139 - 4 (screenshot report, 5 days)</h3>
       <div class="test-card">
-        <weather-forecast-card id="test-card-bug-139-4"></weather-forecast-card>
+        <particle-man-card id="test-card-bug-139-4"></particle-man-card>
       </div>
       <div id="error">
         <p id="error-message"></p>
@@ -191,7 +191,7 @@
         }
       };
 
-      customElements.whenDefined("weather-forecast-card").then(() => {
+      customElements.whenDefined("particle-man-card").then(() => {
         const mockHass = new MockHass();
         const hass = mockHass.getHass();
 

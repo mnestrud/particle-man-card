@@ -37,7 +37,7 @@ describe("weather-forecast-card chart", () => {
     const config: WeatherForecastCardConfig = merge(
       {},
       {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         forecast: {
           mode: ForecastMode.Chart,
@@ -545,14 +545,14 @@ describe("weather-forecast-card chart", () => {
     };
 
     const card = await fixture<WeatherForecastCard>(html`
-      <weather-forecast-card
+      <particle-man-card
         .hass=${hass}
         .config=${{
-          type: "custom:weather-forecast-card",
+          type: "custom:particle-man-card",
           entity: "weather.demo",
           forecast: { mode: ForecastMode.Chart },
         }}
-      ></weather-forecast-card>
+      ></particle-man-card>
     `);
 
     const chartElement = card.shadowRoot!.querySelector(

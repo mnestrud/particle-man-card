@@ -4,4 +4,4 @@ const logLevel = LogLevels.info;
 
 export const logger = createConsola({
   level: logLevel,
-}).withTag("weather-forecast-card");
+}).withTag("particle-man-card");

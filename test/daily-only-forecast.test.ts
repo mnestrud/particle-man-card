@@ -39,7 +39,7 @@ describe("daily-only forecast", () => {
 
   describe("simple mode", () => {
     const testConfig: WeatherForecastCardConfig = {
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       default_forecast: "daily",
       forecast: {
@@ -52,10 +52,10 @@ describe("daily-only forecast", () => {
 
     beforeEach(async () => {
       card = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       expect(card).not.toBeNull();
@@ -141,7 +141,7 @@ describe("daily-only forecast", () => {
 
     it("should respect daily_slots limit", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         default_forecast: "daily",
         forecast: {
@@ -175,7 +175,7 @@ describe("daily-only forecast", () => {
 
     it("should auto-switch to daily if config specifies hourly but only daily is available", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         default_forecast: "hourly", // Request hourly
         forecast: {
@@ -184,10 +184,10 @@ describe("daily-only forecast", () => {
       };
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${config}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(config);
@@ -202,7 +202,7 @@ describe("daily-only forecast", () => {
 
   describe("chart mode", () => {
     const testConfig: WeatherForecastCardConfig = {
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       default_forecast: "daily",
       forecast: {
@@ -215,10 +215,10 @@ describe("daily-only forecast", () => {
 
     beforeEach(async () => {
       card = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       expect(card).not.toBeNull();
@@ -275,7 +275,7 @@ describe("daily-only forecast", () => {
 
     it("should respect daily_slots limit in chart mode", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         default_forecast: "daily",
         forecast: {
@@ -308,16 +308,16 @@ describe("no forecast support", () => {
     hass.states["weather.demo"].attributes.supported_features = 0;
 
     const config: WeatherForecastCardConfig = {
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       show_forecast: true,
     };
 
     const card = await fixture<WeatherForecastCard>(
-      html`<weather-forecast-card
+      html`<particle-man-card
         .hass=${hass}
         .config=${config}
-      ></weather-forecast-card>`
+      ></particle-man-card>`
     );
 
     card.setConfig(config);
@@ -338,17 +338,17 @@ describe("no forecast support", () => {
     hass.states["weather.demo"].attributes.supported_features = 0;
 
     const config: WeatherForecastCardConfig = {
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       show_forecast: true,
       show_current: false, // Only forecast (which won't be available)
     };
 
     const card = await fixture<WeatherForecastCard>(
-      html`<weather-forecast-card
+      html`<particle-man-card
         .hass=${hass}
         .config=${config}
-      ></weather-forecast-card>`
+      ></particle-man-card>`
     );
 
     card.setConfig(config);
@@ -371,16 +371,16 @@ describe("no forecast support", () => {
     hass.states["weather.demo"].attributes.supported_features = 1;
 
     const config: WeatherForecastCardConfig = {
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       show_forecast: false, // Explicitly disabled
     };
 
     const card = await fixture<WeatherForecastCard>(
-      html`<weather-forecast-card
+      html`<particle-man-card
         .hass=${hass}
         .config=${config}
-      ></weather-forecast-card>`
+      ></particle-man-card>`
     );
 
     card.setConfig(config);

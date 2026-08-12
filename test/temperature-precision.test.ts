@@ -37,7 +37,7 @@ describe("temperature_precision", () => {
   describe("current weather temperature_precision", () => {
     it("should format temperature with default precision (no config)", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
       };
 
@@ -60,7 +60,7 @@ describe("temperature_precision", () => {
 
     it("should format temperature with 0 decimal places", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_precision: 0,
@@ -85,7 +85,7 @@ describe("temperature_precision", () => {
 
     it("should format temperature with 1 decimal place", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_precision: 1,
@@ -110,7 +110,7 @@ describe("temperature_precision", () => {
 
     it("should format temperature with 2 decimal places", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_precision: 2,
@@ -135,7 +135,7 @@ describe("temperature_precision", () => {
 
     it("should format high/low temperatures with precision", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_precision: 0,
@@ -176,7 +176,7 @@ describe("temperature_precision", () => {
       };
 
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_entity: "sensor.outdoor_temp",
@@ -211,7 +211,7 @@ describe("temperature_precision", () => {
       };
 
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_entity: "sensor.outdoor_temp",
@@ -248,7 +248,7 @@ describe("temperature_precision", () => {
       hass.states["weather.demo"] = weatherEntity;
 
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           show_attributes: ["dew_point"],
@@ -286,7 +286,7 @@ describe("temperature_precision", () => {
       hass.states["weather.demo"] = weatherEntity;
 
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           show_attributes: ["apparent_temperature"],
@@ -317,7 +317,7 @@ describe("temperature_precision", () => {
   describe("forecast chart temperature_precision", () => {
     it("should render chart without errors with precision set to 0", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         forecast: {
           mode: ForecastMode.Chart,
@@ -344,7 +344,7 @@ describe("temperature_precision", () => {
 
     it("should render chart without errors with precision set to 1", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         forecast: {
           mode: ForecastMode.Chart,
@@ -371,7 +371,7 @@ describe("temperature_precision", () => {
 
     it("should render chart without errors with precision set to 2", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         forecast: {
           mode: ForecastMode.Chart,
@@ -411,7 +411,7 @@ describe("temperature_precision", () => {
       hassFahrenheit.states["weather.demo"] = weatherEntityF;
 
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_precision: 1,
@@ -446,7 +446,7 @@ describe("temperature_precision", () => {
       hassFahrenheit.states["weather.demo"] = weatherEntityF;
 
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_precision: 0,
@@ -482,7 +482,7 @@ describe("temperature_precision", () => {
       hass.states["weather.demo"] = weatherEntity;
 
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_precision: 1,
@@ -516,7 +516,7 @@ describe("temperature_precision", () => {
       hass.states["weather.demo"] = weatherEntity;
 
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_precision: 2,
@@ -541,7 +541,7 @@ describe("temperature_precision", () => {
 
     it("should handle undefined temperature_precision gracefully", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_precision: undefined,

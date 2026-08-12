@@ -17,7 +17,7 @@ describe("weather-forecast-card", () => {
   const hass = mockHassInstance.getHass() as ExtendedHomeAssistant;
 
   const testConfig: WeatherForecastCardConfig = {
-    type: "custom:weather-forecast-card",
+    type: "custom:particle-man-card",
     entity: "weather.demo",
     forecast: {
       show_sun_times: false,
@@ -28,10 +28,10 @@ describe("weather-forecast-card", () => {
 
   beforeEach(async () => {
     card = await fixture<WeatherForecastCard>(
-      html`<weather-forecast-card
+      html`<particle-man-card
         .hass=${hass}
         .config=${testConfig}
-      ></weather-forecast-card>`
+      ></particle-man-card>`
     );
 
     expect(card).not.toBeNull();
@@ -222,7 +222,7 @@ describe("weather-forecast-card", () => {
   describe("should respect forecast limits", () => {
     it("should respect daily_slots limit", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         forecast: {
           daily_slots: 3,
@@ -245,7 +245,7 @@ describe("weather-forecast-card", () => {
 
     it("should respect hourly_slots limit", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         default_forecast: "hourly",
         forecast: {
@@ -269,7 +269,7 @@ describe("weather-forecast-card", () => {
 
     it("should respect hourly_slots limit with hourly_group_size", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         default_forecast: "hourly",
         forecast: {
@@ -296,7 +296,7 @@ describe("weather-forecast-card", () => {
 
     it("should show all items when slots are not defined", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
       };
 
@@ -316,7 +316,7 @@ describe("weather-forecast-card", () => {
   describe("should validate card configuration", () => {
     it("should throw error if entity is missing", () => {
       const config = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
       } as WeatherForecastCardConfig;
 
       expect(() => card.setConfig(config)).toThrow("entity is required");
@@ -324,7 +324,7 @@ describe("weather-forecast-card", () => {
 
     it("should throw error if daily_slots is 0 or less", async () => {
       const config = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         forecast: {
           daily_slots: 0,
@@ -338,7 +338,7 @@ describe("weather-forecast-card", () => {
 
     it("should throw error if hourly_slots is 0 or less", async () => {
       const config = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         forecast: {
           hourly_slots: 0,
@@ -352,7 +352,7 @@ describe("weather-forecast-card", () => {
 
     it("should throw error if current.temperature_precision is negative", async () => {
       const config = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_precision: -1,
@@ -366,7 +366,7 @@ describe("weather-forecast-card", () => {
 
     it("should throw error if forecast.temperature_precision is negative", async () => {
       const config = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         forecast: {
           temperature_precision: -2,
@@ -380,7 +380,7 @@ describe("weather-forecast-card", () => {
 
     it("should throw error if current.temperature_precision is greater than 2", async () => {
       const config = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           temperature_precision: 3,
@@ -394,7 +394,7 @@ describe("weather-forecast-card", () => {
 
     it("should throw error if forecast.temperature_precision is greater than 2", async () => {
       const config = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         forecast: {
           temperature_precision: 4,
@@ -408,7 +408,7 @@ describe("weather-forecast-card", () => {
 
     it("should migrate root-level temperature_entity to current.temperature_entity", () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         temperature_entity: "sensor.outdoor_temp",
       };
@@ -425,7 +425,7 @@ describe("weather-forecast-card", () => {
 
     it("should prefer current.temperature_entity over root-level temperature_entity", () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         temperature_entity: "sensor.legacy_temp",
         current: {
@@ -443,7 +443,7 @@ describe("weather-forecast-card", () => {
 
     it("should not override existing current config when migrating temperature_entity", () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         temperature_entity: "sensor.outdoor_temp",
         current: {
@@ -610,10 +610,10 @@ describe("weather-forecast-card", () => {
   describe("reconnection and popup scenarios", () => {
     it("should establish subscriptions when reconnected to DOM with hasUpdated=true", async () => {
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -655,10 +655,10 @@ describe("weather-forecast-card", () => {
 
     it("should unsubscribe after a sustained disconnection", async () => {
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -689,10 +689,10 @@ describe("weather-forecast-card", () => {
       const testHass = forecastHass.getHass() as ExtendedHomeAssistant;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${testHass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -712,10 +712,10 @@ describe("weather-forecast-card", () => {
       const testHass = forecastHass.getHass() as ExtendedHomeAssistant;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${testHass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -733,10 +733,10 @@ describe("weather-forecast-card", () => {
 
     it("should not create duplicate subscriptions on reconnect", async () => {
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -775,10 +775,10 @@ describe("weather-forecast-card", () => {
       const testHass = forecastHass.getHass() as ExtendedHomeAssistant;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${testHass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -810,10 +810,10 @@ describe("weather-forecast-card", () => {
       const testHass = forecastHass.getHass() as ExtendedHomeAssistant;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${testHass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -838,10 +838,10 @@ describe("weather-forecast-card", () => {
 
     it("should render forecast data after reconnection", async () => {
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -882,10 +882,10 @@ describe("weather-forecast-card", () => {
       };
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${testHass}
           .config=${dailyConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(dailyConfig);
@@ -910,10 +910,10 @@ describe("weather-forecast-card", () => {
       };
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${testHass}
           .config=${hourlyConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(hourlyConfig);
@@ -936,10 +936,10 @@ describe("weather-forecast-card", () => {
       const testHass = forecastHass.getHass() as ExtendedHomeAssistant;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${testHass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -983,10 +983,10 @@ describe("weather-forecast-card", () => {
       const testHass = forecastHass.getHass() as ExtendedHomeAssistant;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${testHass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -1026,10 +1026,10 @@ describe("weather-forecast-card", () => {
       const testHass = forecastHass.getHass() as ExtendedHomeAssistant;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${testHass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -1061,10 +1061,10 @@ describe("weather-forecast-card", () => {
       const testHass = forecastHass.getHass() as ExtendedHomeAssistant;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${testHass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);
@@ -1095,7 +1095,7 @@ describe("weather-forecast-card", () => {
 
   describe("current entity reactivity", () => {
     const reactiveConfig: WeatherForecastCardConfig = {
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       current: {
         temperature_entity: "sensor.temperature_outdoor",
@@ -1130,10 +1130,10 @@ describe("weather-forecast-card", () => {
       const baseHass = mockHassInstance.getHass() as ExtendedHomeAssistant;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${baseHass}
           .config=${reactiveConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(reactiveConfig);
@@ -1162,10 +1162,10 @@ describe("weather-forecast-card", () => {
       const baseHass = mockHassInstance.getHass() as ExtendedHomeAssistant;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${baseHass}
           .config=${reactiveConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(reactiveConfig);
@@ -1181,7 +1181,7 @@ describe("weather-forecast-card", () => {
       const baseHass = mockHassInstance.getHass() as ExtendedHomeAssistant;
 
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           show_attributes: [
@@ -1193,10 +1193,10 @@ describe("weather-forecast-card", () => {
       };
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${baseHass}
           .config=${config}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(config);
@@ -1222,7 +1222,7 @@ describe("weather-forecast-card", () => {
       const baseHass = mockHassInstance.getHass() as ExtendedHomeAssistant;
 
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         current: {
           secondary_info_attribute: {
@@ -1234,10 +1234,10 @@ describe("weather-forecast-card", () => {
       };
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${baseHass}
           .config=${config}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(config);
@@ -1262,10 +1262,10 @@ describe("weather-forecast-card", () => {
       const baseHass = mockHassInstance.getHass() as ExtendedHomeAssistant;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${baseHass}
           .config=${reactiveConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(reactiveConfig);
@@ -1298,10 +1298,10 @@ describe("weather-forecast-card", () => {
       forecastHass.hourlyForecast = TEST_FORECAST_HOURLY;
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${forecastHass.getHass() as ExtendedHomeAssistant}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(testConfig);

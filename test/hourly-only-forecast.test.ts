@@ -39,7 +39,7 @@ describe("hourly-only forecast", () => {
 
   describe("simple mode", () => {
     const testConfig: WeatherForecastCardConfig = {
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       default_forecast: "hourly",
       forecast: {
@@ -52,10 +52,10 @@ describe("hourly-only forecast", () => {
 
     beforeEach(async () => {
       card = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       expect(card).not.toBeNull();
@@ -140,7 +140,7 @@ describe("hourly-only forecast", () => {
 
     it("should respect hourly_slots limit", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         default_forecast: "hourly",
         forecast: {
@@ -174,7 +174,7 @@ describe("hourly-only forecast", () => {
 
     it("should auto-switch to hourly if config specifies daily but only hourly is available", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         default_forecast: "daily", // Request daily
         forecast: {
@@ -183,10 +183,10 @@ describe("hourly-only forecast", () => {
       };
 
       const testCard = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${config}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       testCard.setConfig(config);
@@ -200,7 +200,7 @@ describe("hourly-only forecast", () => {
 
     it("should respect hourly_group_size aggregation", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         default_forecast: "hourly",
         forecast: {
@@ -223,7 +223,7 @@ describe("hourly-only forecast", () => {
 
   describe("chart mode", () => {
     const testConfig: WeatherForecastCardConfig = {
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       default_forecast: "hourly",
       forecast: {
@@ -236,10 +236,10 @@ describe("hourly-only forecast", () => {
 
     beforeEach(async () => {
       card = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       expect(card).not.toBeNull();
@@ -296,7 +296,7 @@ describe("hourly-only forecast", () => {
 
     it("should respect hourly_slots limit in chart mode", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         default_forecast: "hourly",
         forecast: {
@@ -315,7 +315,7 @@ describe("hourly-only forecast", () => {
 
     it("should respect hourly_group_size in chart mode", async () => {
       const config: WeatherForecastCardConfig = {
-        type: "custom:weather-forecast-card",
+        type: "custom:particle-man-card",
         entity: "weather.demo",
         default_forecast: "hourly",
         forecast: {

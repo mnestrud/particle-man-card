@@ -33,7 +33,7 @@ describe("twice_daily forecast", () => {
 
   describe("simple mode", () => {
     const testConfig: WeatherForecastCardConfig = {
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       default_forecast: "daily",
       forecast: {
@@ -46,10 +46,10 @@ describe("twice_daily forecast", () => {
 
     beforeEach(async () => {
       card = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       expect(card).not.toBeNull();
@@ -122,7 +122,7 @@ describe("twice_daily forecast", () => {
 
   describe("chart mode", () => {
     const testConfig: WeatherForecastCardConfig = {
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       default_forecast: "daily",
       forecast: {
@@ -135,10 +135,10 @@ describe("twice_daily forecast", () => {
 
     beforeEach(async () => {
       card = await fixture<WeatherForecastCard>(
-        html`<weather-forecast-card
+        html`<particle-man-card
           .hass=${hass}
           .config=${testConfig}
-        ></weather-forecast-card>`
+        ></particle-man-card>`
       );
 
       expect(card).not.toBeNull();
@@ -190,7 +190,7 @@ describe("twice_daily only forecast", () => {
   mockHassInstance.hourlyForecast = [];
 
   const testConfig: WeatherForecastCardConfig = {
-    type: "custom:weather-forecast-card",
+    type: "custom:particle-man-card",
     entity: "weather.demo",
     default_forecast: "daily",
     forecast: {
@@ -203,10 +203,10 @@ describe("twice_daily only forecast", () => {
 
   beforeEach(async () => {
     card = await fixture<WeatherForecastCard>(
-      html`<weather-forecast-card
+      html`<particle-man-card
         .hass=${hass}
         .config=${testConfig}
-      ></weather-forecast-card>`
+      ></particle-man-card>`
     );
 
     expect(card).not.toBeNull();
@@ -260,16 +260,16 @@ describe("forecast type preference", () => {
       WeatherEntityFeature.FORECAST_HOURLY;
 
     const config: WeatherForecastCardConfig = {
-      type: "custom:weather-forecast-card",
+      type: "custom:particle-man-card",
       entity: "weather.demo",
       default_forecast: "daily",
     };
 
     const card = await fixture<WeatherForecastCard>(
-      html`<weather-forecast-card
+      html`<particle-man-card
         .hass=${hass}
         .config=${config}
-      ></weather-forecast-card>`
+      ></particle-man-card>`
     );
 
     card.setConfig(config);
