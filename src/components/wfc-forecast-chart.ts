@@ -29,6 +29,7 @@ import {
   WeatherEntity,
 } from "../data/weather";
 import { getUvIndexColor } from "../data/uv-index";
+import { renderViewSwitcher } from "./view-switcher";
 import { BandRow as BandRowData } from "../data/forecast-bands";
 import {
   LineController,
@@ -125,6 +126,7 @@ export class WfcForecastChart extends LitElement {
   @property({ attribute: false }) itemWidth: number = 0;
   @property({ attribute: false }) isScrollable = false;
   @property({ attribute: false }) bandRows: BandRowData[] = [];
+  @property({ attribute: false }) availableViews: ForecastType[] = [];
   @query("canvas") private _canvas?: HTMLCanvasElement;
 
   @state() private _settingsOpen = false;
@@ -218,12 +220,27 @@ export class WfcForecastChart extends LitElement {
       <div
         class="${classMap({
           "wfc-forecast-chart-settings": true,
-          "has-selector": !!this.config.forecast?.show_attribute_selector,
+          "has-selector":
+            !!this.config.forecast?.show_attribute_selector ||
+            this.availableViews.length > 1,
         })}"
       >
+        ${renderViewSwitcher(
+          this.hass,
+          this.availableViews,
+          this.forecastType,
+          (view) =>
+            this.dispatchEvent(
+              new CustomEvent("view-selected", {
+                detail: { view },
+                bubbles: true,
+                composed: true,
+              })
+            )
+        )}
         ${this.config.forecast?.show_attribute_selector
-          ? html`<span>${this._localizeSelectedAttribute()}</span>
-              <div class="wfc-forecast-chart-attribute-selector">
+          ? html`<div class="wfc-forecast-chart-attribute-selector">
+                <span>${this._localizeSelectedAttribute()}</span>
                 <ha-button
                   class="wfc-settings-toggle-button"
                   size="s"

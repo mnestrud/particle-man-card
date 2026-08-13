@@ -629,13 +629,21 @@ pmc-animation-provider.dark[has-clouds] ~ .wfc-container .wfc-current-secondary-
   margin-bottom: var(--wfc-component-gap);
 }
 
-.wfc-forecast-chart-settings span {
-  font-size: var(--ha-font-size-xl, 16px);
+.wfc-forecast-chart-settings span:not(.pmc-views):not(.view) {
+  font-size: var(--ha-font-size-m, 14px);
   line-height: var(--ha-line-height-condensed, 1.2);
-  color: var(--primary-text-color, #212121);
+  color: var(--secondary-text-color, #9b9b9b);
   user-select: none;
   -webkit-user-select: none;
-  padding-left: var(--ha-space-2, 8px);
+  padding-right: var(--ha-space-2, 8px);
+}
+
+.wfc-forecast-chart-settings .pmc-views {
+  padding-left: var(--ha-space-1, 4px);
+}
+
+.pmc-views .view {
+  cursor: pointer;
 }
 .wfc-forecast-chart-attribute-selector {
   position: relative;

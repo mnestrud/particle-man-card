@@ -68,6 +68,7 @@ import "./components/wfc-air-quality";
 import "./components/wfc-pollen";
 import { SolarLookup, fetchSolarForecast, mergeSolarForecast } from "./data/solar";
 import { BandRow, buildForecastBands } from "./data/forecast-bands";
+import { renderViewSwitcher } from "./components/view-switcher";
 import { localize } from "./localize/localize";
 
 const DEFAULT_CONFIG: Partial<WeatherForecastCardConfig> = {
@@ -527,11 +528,15 @@ export class WeatherForecastCard extends LitElement {
             : nothing}
           ${this.config.show_forecast === false
             ? nothing
-            : html`${this.renderForecastHeader()}
+            : html`${isChartMode ? nothing : this.renderForecastHeader()}
               <div class="wfc-forecast-container">
                 ${isChartMode
                   ? html`<pmc-forecast-chart
                       @action=${this.onForecastAction}
+                      @view-selected=${(ev: CustomEvent) => {
+                        this._currentForecastType = ev.detail.view;
+                      }}
+                      .availableViews=${this.availableForecastViews()}
                       .hass=${this.hass}
                       .config=${this.config}
                       .weatherEntity=${stateObject}
@@ -762,33 +767,19 @@ export class WeatherForecastCard extends LitElement {
    * group cycles. The chart body itself belongs to the tooltip/scrub gesture.
    */
   private renderForecastHeader(): TemplateResult | typeof nothing {
-    const views = this.availableForecastViews();
-    const labelFor = (view: ForecastType) =>
-      localize(this.hass, view === "hourly" ? "forecast.hourly" : "forecast.daily");
     return html`
       <div class="pmc-panel-header pmc-forecast-header">
         <span class="pmc-panel-title">
           ${localize(this.hass, "forecast.title")}
         </span>
-        ${views.length > 1
-          ? html`<button
-              class="pmc-views"
-              @click=${() => this._toggleForecastView()}
-            >
-              ${views.map(
-                (view) => html`<span
-                  class="view ${view === this._currentForecastType
-                    ? "active"
-                    : ""}"
-                  @click=${(ev: Event) => {
-                    ev.stopPropagation();
-                    this._currentForecastType = view;
-                  }}
-                  >${labelFor(view)}</span
-                >`
-              )}
-            </button>`
-          : nothing}
+        ${renderViewSwitcher(
+          this.hass,
+          this.availableForecastViews(),
+          this._currentForecastType,
+          (view) => {
+            this._currentForecastType = view;
+          }
+        )}
       </div>
     `;
   }
