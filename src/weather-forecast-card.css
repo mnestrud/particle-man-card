@@ -692,3 +692,105 @@ wfc-weather-condition-icon-provider {
   position: absolute;
   inset: 0;
 }
+
+/* --- Weather alerts (wfc-alerts) ----------------------------------------- */
+
+.wfc-alerts {
+  --wfc-alerts-color: var(--info-color, var(--primary-color));
+  border-radius: var(--ha-border-radius-lg, 12px);
+  border: 1px solid var(--wfc-alerts-color);
+  background: color-mix(in srgb, var(--wfc-alerts-color) 12%, transparent);
+  margin-bottom: var(--ha-space-2, 8px);
+  overflow: hidden;
+}
+
+.wfc-alerts-extreme {
+  --wfc-alerts-color: var(--weather-forecast-card-alert-extreme-color, var(--error-color, #db4437));
+}
+
+.wfc-alerts-severe {
+  --wfc-alerts-color: var(--weather-forecast-card-alert-severe-color, var(--error-color, #db4437));
+}
+
+.wfc-alerts-moderate {
+  --wfc-alerts-color: var(--weather-forecast-card-alert-moderate-color, var(--warning-color, #ffa600));
+}
+
+.wfc-alerts-minor {
+  --wfc-alerts-color: var(--weather-forecast-card-alert-minor-color, var(--info-color, #039be5));
+}
+
+.wfc-alerts-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--ha-space-2, 8px);
+  width: 100%;
+  padding: var(--ha-space-2, 8px) var(--ha-space-3, 12px);
+  border: none;
+  background: none;
+  color: var(--primary-text-color);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.wfc-alerts-banner ha-icon {
+  color: var(--wfc-alerts-color);
+  flex-shrink: 0;
+}
+
+.wfc-alerts-banner-text {
+  flex: 1;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wfc-alerts-severity-label {
+  font-size: var(--ha-font-size-s, 12px);
+  color: var(--wfc-alerts-color);
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.wfc-alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ha-space-2, 8px);
+  padding: 0 var(--ha-space-3, 12px) var(--ha-space-3, 12px);
+}
+
+.wfc-alerts-item {
+  border-left: 3px solid var(--wfc-alerts-color);
+  padding-left: var(--ha-space-2, 8px);
+}
+
+.wfc-alerts-item-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ha-space-2, 8px);
+  align-items: baseline;
+}
+
+.wfc-alerts-item-title {
+  font-weight: 500;
+}
+
+.wfc-alerts-item-until,
+.wfc-alerts-item-area {
+  font-size: var(--ha-font-size-s, 12px);
+  color: var(--secondary-text-color);
+}
+
+.wfc-alerts-item-description,
+.wfc-alerts-item-instruction {
+  font-size: var(--ha-font-size-s, 12px);
+  margin-top: var(--ha-space-1, 4px);
+  white-space: pre-line;
+}
+
+.wfc-alerts-item-instruction-label {
+  font-weight: 600;
+}

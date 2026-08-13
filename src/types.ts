@@ -129,6 +129,12 @@ export interface WeatherForecastCardForecastActionConfig {
   double_tap_action?: ForecastActionConfig;
 }
 
+/** Severity-colored weather-alert banner with expandable detail. */
+export interface AlertsConfig {
+  /** Alert-count sensor whose `alerts` attribute holds the alert list. */
+  entity: string;
+}
+
 /** Minute-forecast strip below the current-weather section. */
 export interface NowcastConfig {
   /**
@@ -152,6 +158,7 @@ export interface WeatherForecastCardConfig {
   air_quality?: DiscoveredPanelConfig;
   pollen?: DiscoveredPanelConfig;
   nowcast?: NowcastConfig;
+  alerts?: AlertsConfig;
   entity: string;
   name?: string;
   /** @deprecated Use `current.temperature_entity` instead */

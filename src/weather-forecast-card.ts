@@ -62,6 +62,8 @@ import "./components/wfc-forecast-chart";
 import "./components/wfc-forecast-simple";
 import "./components/wfc-current-weather";
 import "./components/animation/wfc-animation-provider";
+import "./components/wfc-nowcast";
+import "./components/wfc-alerts";
 
 const DEFAULT_CONFIG: Partial<WeatherForecastCardConfig> = {
   type: "custom:particle-man-card",
@@ -198,7 +200,14 @@ export class WeatherForecastCard extends LitElement {
 
     // Anchors may have changed, so previous discovery no longer applies.
     this.watchSet = new EntityWatchSet();
-    this.watchSet.setStatic(getReferencedCurrentEntities(this.config));
+    const staticIds = getReferencedCurrentEntities(this.config);
+    if (this.config.alerts?.entity) {
+      staticIds.push(this.config.alerts.entity);
+    }
+    if (this.config.nowcast?.entity?.startsWith("sensor.")) {
+      staticIds.push(this.config.nowcast.entity);
+    }
+    this.watchSet.setStatic(staticIds);
     this.discoveryStarted = new Set();
     this._discovery = {};
   }
@@ -453,6 +462,12 @@ export class WeatherForecastCard extends LitElement {
                   .dailyForecast=${this._dailyForecastData}
                 ></wfc-current-weather>
               </div>`
+            : nothing}
+          ${this.config.alerts?.entity
+            ? html`<wfc-alerts
+                .hass=${this.hass}
+                .entityId=${this.config.alerts.entity}
+              ></wfc-alerts>`
             : nothing}
           ${this.config.nowcast
             ? html`<wfc-nowcast
