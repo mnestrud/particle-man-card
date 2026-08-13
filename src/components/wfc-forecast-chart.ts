@@ -1137,15 +1137,18 @@ export class WfcForecastChart extends LitElement {
   }
 
   private _localizeSelectedAttribute(): string {
+    // The default series needs no label — the panel header already reads
+    // "Forecast", and repeating it here doubled the heading. Non-default
+    // attributes keep their name so the chart says what it's showing.
     if (this._selectedAttribute === "temperature_and_precipitation") {
-      return this.hass.localize("ui.card.weather.forecast");
+      return "";
     }
 
     return (
       this.hass.formatEntityAttributeName(
         this.weatherEntity,
         this._selectedAttribute
-      ) || this.hass.localize("ui.card.weather.forecast")
+      ) || ""
     );
   }
 
