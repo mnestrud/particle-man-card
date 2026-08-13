@@ -1,0 +1,157 @@
+<!-- @dsCard group="Particle Man Card" -->
+<title>Temperature readability options</title>
+<link rel="stylesheet" href="tokens.css" />
+<link rel="stylesheet" href="shared.css" />
+<style>
+  body { background: #808289; }
+  .mock-stage { background: var(--primary-background-color); padding: 20px; border-radius: 12px;
+    display: flex; flex-direction: column; gap: 16px; }
+  .variant-label { font: 650 12px/1.4 var(--pmc-font); color: var(--primary-text-color); }
+  .variant-label small { display: block; font-weight: 400; color: var(--secondary-text-color); }
+  .tempchart { width: 100%; height: 84px; display: block; }
+  .chartwrap { position: relative; }
+  .templabel {
+    position: absolute; font-size: 10px; font-weight: 650;
+    color: var(--primary-text-color); transform: translate(-50%, -115%);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .templabel.lo { transform: translate(-50%, 25%); color: var(--secondary-text-color); }
+  .templabel.now { transform: translate(6px, -50%); color: var(--secondary-text-color); }
+  .templabel.inline { font-weight: 550; color: var(--secondary-text-color); }
+  .now-dot {
+    position: absolute; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--primary-color); transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 25%, transparent);
+  }
+  /* Variant C: dashed reference lines at the hi/lo levels, labels on the right */
+  .gridline {
+    position: absolute; left: 0; right: 34px;
+    border-top: 1px dashed color-mix(in srgb, var(--secondary-text-color) 35%, transparent);
+  }
+  .gridline span {
+    position: absolute; right: -34px; top: 0; transform: translateY(-50%);
+    font: 650 10px var(--pmc-font); color: var(--secondary-text-color);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+
+<div class="mock-pair">
+  <div class="mock-col" data-theme="light">
+    <span class="tag">Light</span>
+    <div class="mock-stage" id="stage-light"></div>
+  </div>
+  <div class="mock-col" data-theme="dark">
+    <span class="tag">Dark</span>
+    <div class="mock-stage" id="stage-dark"></div>
+  </div>
+</div>
+
+<template id="stage-template">
+  <div class="variant-label">1 · Hi/Lo on the line (baseline, recommended)
+    <small>Day's high and low labeled at their points, "now" dot with current
+    temp at the left edge. Minimal ink; already applied to the composites.</small>
+  </div>
+  <div class="ha-card"><div class="pmc-panel">
+    <div class="chartwrap" data-mode="baseline"></div>
+    <div class="pmc-axis"><span>3 PM</span><span>9 PM</span><span>3 AM</span><span>9 AM</span><span>3 PM</span></div>
+  </div></div>
+
+  <div class="variant-label">2 · Sparse in-line labels
+    <small>Baseline plus a temp every ~6 hours riding the line — read any part
+    of the day without reference lines. Apple-Weather-ish; busiest option.</small>
+  </div>
+  <div class="ha-card"><div class="pmc-panel">
+    <div class="chartwrap" data-mode="inline"></div>
+    <div class="pmc-axis"><span>3 PM</span><span>9 PM</span><span>3 AM</span><span>9 AM</span><span>3 PM</span></div>
+  </div></div>
+
+  <div class="variant-label">3 · Hi/Lo reference lines
+    <small>Baseline plus dashed gridlines at the high and low levels with
+    right-edge labels — an implicit y-axis. Calmest way to judge everything
+    in between.</small>
+  </div>
+  <div class="ha-card"><div class="pmc-panel">
+    <div class="chartwrap" data-mode="grid"></div>
+    <div class="pmc-axis"><span>3 PM</span><span>9 PM</span><span>3 AM</span><span>9 AM</span><span>3 PM</span></div>
+  </div></div>
+
+  <div class="variant-label">4 · Area fill
+    <small>Baseline plus a soft gradient under the line — height reads as
+    warmth at a glance from across the room. Pure decoration below the line,
+    no extra numbers.</small>
+  </div>
+  <div class="ha-card"><div class="pmc-panel">
+    <div class="chartwrap" data-mode="area"></div>
+    <div class="pmc-axis"><span>3 PM</span><span>9 PM</span><span>3 AM</span><span>9 AM</span><span>3 PM</span></div>
+  </div></div>
+</template>
+
+<script>
+  const temps = [76,75,74,74,73,73,74,77,80,83,85,87,88,88,87,85,83,81,80,79,78,78,77,76];
+  const tMin = 73, tMax = 88;
+  const yOf = (t) => 66 - ((t - tMin) / (tMax - tMin)) * 48;
+  const xOf = (i) => (i / (temps.length - 1)) * 400;
+  const points = temps.map((t, i) => `${xOf(i)},${yOf(t)}`).join(" ");
+
+  const SVG = "http://www.w3.org/2000/svg";
+  function buildChart(wrap, mode, side) {
+    const svg = document.createElementNS(SVG, "svg");
+    svg.setAttribute("class", "tempchart");
+    svg.setAttribute("viewBox", "0 0 400 84");
+    svg.setAttribute("preserveAspectRatio", "none");
+    if (mode === "area") {
+      const gradId = `tempfill-${side}`;
+      svg.innerHTML =
+        `<defs><linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+           <stop offset="0" stop-color="rgb(238,147,0)" stop-opacity="0.28"/>
+           <stop offset="1" stop-color="rgb(238,147,0)" stop-opacity="0"/>
+         </linearGradient></defs>
+         <polygon fill="url(#${gradId})" points="${points} 400,84 0,84"/>`;
+    }
+    const poly = document.createElementNS(SVG, "polyline");
+    poly.setAttribute("fill", "none");
+    poly.setAttribute("stroke", "var(--primary-color)");
+    poly.setAttribute("stroke-width", "2.5");
+    poly.setAttribute("stroke-linecap", "round");
+    poly.setAttribute("stroke-linejoin", "round");
+    poly.setAttribute("points", points);
+    svg.append(poly);
+    wrap.append(svg);
+
+    const place = (cls, i, text) => {
+      const el = document.createElement("div");
+      el.className = cls;
+      el.style.left = `${(i / (temps.length - 1)) * 100}%`;
+      el.style.top = `${(yOf(temps[i]) / 84) * 100}%`;
+      if (text) el.textContent = text;
+      wrap.append(el);
+    };
+    const iHi = temps.indexOf(Math.max(...temps));
+    const iLo = temps.indexOf(Math.min(...temps));
+    place("templabel", iHi, `H ${temps[iHi]}°`);
+    place("templabel lo", iLo, `L ${temps[iLo]}°`);
+    place("now-dot", 0);
+    place("templabel now", 0, `${temps[0]}°`);
+
+    if (mode === "inline") {
+      for (const i of [6, 18]) place("templabel inline", i, `${temps[i]}°`);
+    }
+    if (mode === "grid") {
+      for (const i of [iHi, iLo]) {
+        const line = document.createElement("div");
+        line.className = "gridline";
+        line.style.top = `${(yOf(temps[i]) / 84) * 100}%`;
+        line.innerHTML = `<span>${temps[i]}°</span>`;
+        wrap.append(line);
+      }
+    }
+  }
+
+  for (const side of ["light", "dark"]) {
+    const stage = document.getElementById(`stage-${side}`);
+    stage.append(document.getElementById("stage-template").content.cloneNode(true));
+    for (const wrap of stage.querySelectorAll(".chartwrap")) {
+      buildChart(wrap, wrap.dataset.mode, side + wrap.dataset.mode);
+    }
+  }
+</script>
