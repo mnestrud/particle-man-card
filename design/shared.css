@@ -46,6 +46,31 @@ body {
   gap: var(--pmc-space-2);
 }
 
+/* Forecast view switcher: lives in the panel header, cycles on tap. The
+   active view is lit; the others are demoted. The chart body itself belongs
+   to the tooltip/scrub gesture. */
+.pmc-views {
+  display: flex;
+  gap: var(--pmc-space-3);
+  font-size: var(--pmc-font-title);
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: var(--pmc-title-tracking);
+}
+
+.pmc-views .view {
+  color: var(--secondary-text-color);
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.pmc-views .view.active {
+  color: var(--primary-text-color);
+  opacity: 1;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 2px;
+}
+
 /* Hero: big numeral + category word + swatch, one baseline-aligned row. */
 .pmc-hero {
   display: flex;
