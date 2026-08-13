@@ -1,6 +1,6 @@
 {
   "name": "particle-man-card",
-  "version": "1.4.0",
+  "version": "1.5.0-devel",
   "description": "All-in-one Home Assistant card for Particle Man: weather, nowcast, air quality and pollen",
   "browserslist": "ios >= 15, safari >= 15, last 2 versions, not dead",
   "author": "troinine",
