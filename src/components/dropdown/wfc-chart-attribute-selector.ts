@@ -14,7 +14,7 @@ interface SelectOption {
   icon: string;
 }
 
-@customElement("wfc-chart-attribute-selector")
+@customElement("pmc-chart-attribute-selector")
 export class WfcChartAttributeSelector extends LitElement {
   @property({ type: Boolean }) open: boolean = false;
   @property({ attribute: false }) public options: SelectOption[] = [];

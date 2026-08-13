@@ -16,7 +16,7 @@ import {
 } from "../data/weather";
 import type { NormalizedAttributeConfig } from "./wfc-current-weather";
 
-@customElement("wfc-current-weather-attributes")
+@customElement("pmc-current-weather-attributes")
 export class WfcCurrentWeatherAttributes extends LitElement {
   @property({ attribute: false }) hass!: ExtendedHomeAssistant;
   @property({ attribute: false }) weatherEntity!: WeatherEntity;
@@ -188,6 +188,6 @@ const getLocalizationKey = memoizeOne((attribute: string): string => {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "wfc-current-weather-attributes": WfcCurrentWeatherAttributes;
+    "pmc-current-weather-attributes": WfcCurrentWeatherAttributes;
   }
 }

@@ -468,12 +468,12 @@ export class WeatherForecastCard extends LitElement {
     return html`
       <ha-card>
         ${this.config.show_condition_effects
-          ? html`<wfc-animation-provider
+          ? html`<pmc-animation-provider
               .hass=${this.hass}
               .weatherEntity=${stateObject}
               .config=${this.config}
               .currentForecast=${this._hourlyForecastData?.[0]}
-            ></wfc-animation-provider>`
+            ></pmc-animation-provider>`
           : nothing}
         <div class="wfc-container">
           ${this.config.show_current
@@ -487,13 +487,13 @@ export class WeatherForecastCard extends LitElement {
                 })}
                 @action=${this.onCardAction}
               >
-                <wfc-current-weather
+                <pmc-current-weather
                   .hass=${this.hass}
                   .weatherEntity=${stateObject}
                   .config=${this.config}
                   .hourlyForecast=${this._hourlyForecastData}
                   .dailyForecast=${this._dailyForecastData}
-                ></wfc-current-weather>
+                ></pmc-current-weather>
               </div>`
             : nothing}
           ${this.config.alerts?.entity
@@ -513,7 +513,7 @@ export class WeatherForecastCard extends LitElement {
             ? nothing
             : html`<div class="wfc-forecast-container">
                 ${isChartMode
-                  ? html`<wfc-forecast-chart
+                  ? html`<pmc-forecast-chart
                       @action=${this.onForecastAction}
                       .hass=${this.hass}
                       .config=${this.config}
@@ -523,8 +523,8 @@ export class WeatherForecastCard extends LitElement {
                       .isTwiceDailyEntity=${isTwiceDailyEntity}
                       .itemWidth=${this._currentItemWidth}
                       .isScrollable=${this._isScrollable}
-                    ></wfc-forecast-chart>`
-                  : html`<wfc-forecast-simple
+                    ></pmc-forecast-chart>`
+                  : html`<pmc-forecast-simple
                       @action=${this.onForecastAction}
                       .hass=${this.hass}
                       .config=${this.config}
@@ -533,7 +533,7 @@ export class WeatherForecastCard extends LitElement {
                       .forecastType=${this._currentForecastType}
                       .isTwiceDailyEntity=${isTwiceDailyEntity}
                       .isScrollable=${this._isScrollable}
-                    ></wfc-forecast-simple>`}
+                    ></pmc-forecast-simple>`}
               </div>`}
           ${this.config.air_quality
             ? html`<wfc-air-quality

@@ -22,7 +22,7 @@ import "./wfc-forecast-header-items";
 import "./wfc-forecast-details";
 import "./wfc-forecast-info";
 
-@customElement("wfc-forecast-simple")
+@customElement("pmc-forecast-simple")
 export class WfcForecastSimple extends LitElement {
   @property({ attribute: false }) hass!: ExtendedHomeAssistant;
   @property({ attribute: false }) weatherEntity!: WeatherEntity;
@@ -74,25 +74,25 @@ export class WfcForecastSimple extends LitElement {
 
       forecastTemplates.push(html`
         <div class="wfc-forecast-slot" data-index=${index}>
-          <wfc-forecast-header-items
+          <pmc-forecast-header-items
             .hass=${this.hass}
             .forecast=${forecast}
             .forecastType=${this.forecastType}
             .isTwiceDailyEntity=${this.isTwiceDailyEntity}
             .config=${this.config}
-          ></wfc-forecast-header-items>
-          <wfc-forecast-details
+          ></pmc-forecast-header-items>
+          <pmc-forecast-details
             .hass=${this.hass}
             .forecast=${forecast}
             .maxPrecipitation=${maxPrecipitation}
             .config=${this.config}
-          ></wfc-forecast-details>
-          <wfc-forecast-info
+          ></pmc-forecast-details>
+          <pmc-forecast-info
             .hass=${this.hass}
             .weatherEntity=${this.weatherEntity}
             .forecast=${forecast}
             .config=${this.config}
-          ></wfc-forecast-info>
+          ></pmc-forecast-info>
         </div>
       `);
     });
@@ -155,6 +155,6 @@ export class WfcForecastSimple extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "wfc-forecast-simple": WfcForecastSimple;
+    "pmc-forecast-simple": WfcForecastSimple;
   }
 }

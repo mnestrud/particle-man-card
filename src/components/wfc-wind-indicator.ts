@@ -8,7 +8,7 @@ import {
   WeatherEntity,
 } from "../data/weather";
 
-@customElement("wfc-wind-indicator")
+@customElement("pmc-wind-indicator")
 export class WfcWindIndicator extends LitElement {
   @property({ attribute: false }) hass!: ExtendedHomeAssistant;
   @property({ attribute: false }) weatherEntity!: WeatherEntity;
@@ -111,6 +111,6 @@ export class WfcWindIndicator extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "wfc-wind-indicator": WfcWindIndicator;
+    "pmc-wind-indicator": WfcWindIndicator;
   }
 }

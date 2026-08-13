@@ -4,7 +4,7 @@ import { ExtendedHomeAssistant, WeatherForecastCardConfig } from "../types";
 import { customElement, property } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 
-@customElement("wfc-forecast-details")
+@customElement("pmc-forecast-details")
 export class WfcForecastDetails extends LitElement {
   @property({ attribute: false }) hass!: ExtendedHomeAssistant;
   @property({ attribute: false }) forecast!: ForecastAttribute;
@@ -78,6 +78,6 @@ export class WfcForecastDetails extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "wfc-forecast-details": WfcForecastDetails;
+    "pmc-forecast-details": WfcForecastDetails;
   }
 }

@@ -57,7 +57,7 @@ const EXTENDED_WEATHER_ATTRIBUTE_ICON_MAP: {
   precipitation: "mdi:weather-rainy",
 };
 
-@customElement("wfc-current-weather")
+@customElement("pmc-current-weather")
 export class WfcCurrentWeather extends LitElement {
   @property({ attribute: false }) hass!: ExtendedHomeAssistant;
   @property({ attribute: false }) weatherEntity!: WeatherEntity;
@@ -83,14 +83,14 @@ export class WfcCurrentWeather extends LitElement {
       this.config.name || this.weatherEntity.attributes.friendly_name;
 
     return html`
-      <div class="wfc-current-weather">
+      <div class="pmc-current-weather">
         <div class="wfc-current-conditions">
-          <wfc-weather-condition-icon-provider
+          <pmc-weather-condition-icon-provider
             .config=${this.config}
             .state=${state}
             .isNightTime=${isNightTime}
             .classes=${"wfc-current-icon"}
-          ></wfc-weather-condition-icon-provider>
+          ></pmc-weather-condition-icon-provider>
           <div class="wfc-name-state">
             <span class="wfc-current-state">
               ${this.hass.formatEntityState(this.weatherEntity)}
@@ -149,12 +149,12 @@ export class WfcCurrentWeather extends LitElement {
           </div>
         </div>
         ${attributes.length > 0
-          ? html`<wfc-current-weather-attributes
+          ? html`<pmc-current-weather-attributes
               .hass=${this.hass}
               .weatherEntity=${this.weatherEntity}
               .config=${this.config}
               .attributeConfigs=${attributes}
-            ></wfc-current-weather-attributes>`
+            ></pmc-current-weather-attributes>`
           : nothing}
       </div>
     `;
@@ -396,6 +396,6 @@ export class WfcCurrentWeather extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "wfc-current-weather": WfcCurrentWeather;
+    "pmc-current-weather": WfcCurrentWeather;
   }
 }

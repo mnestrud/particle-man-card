@@ -218,15 +218,21 @@ class ActionHandler extends HTMLElement implements IActionHandler {
   }
 }
 
-customElements.define("action-handler-wfc", ActionHandler);
+// Guarded and fork-suffixed: the upstream card defines action-handler-pmc at
+// module top level, so an unguarded duplicate define would throw and kill the
+// whole bundle before the card element ever registers — the co-installation
+// failure mode this fork must survive.
+if (!customElements.get("action-handler-pmc")) {
+  customElements.define("action-handler-pmc", ActionHandler);
+}
 
 const getActionHandler = (): ActionHandler => {
   const body = document.body;
-  if (body.querySelector("action-handler-wfc")) {
-    return body.querySelector("action-handler-wfc") as ActionHandler;
+  if (body.querySelector("action-handler-pmc")) {
+    return body.querySelector("action-handler-pmc") as ActionHandler;
   }
 
-  const actionhandler = document.createElement("action-handler-wfc");
+  const actionhandler = document.createElement("action-handler-pmc");
   body.appendChild(actionhandler);
 
   return actionhandler as ActionHandler;

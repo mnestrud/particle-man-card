@@ -26,7 +26,7 @@ const REFRESH_INTERVAL_MS = 60_000;
 /**
  * Precipitation nowcast strip.
  *
- * Deliberately a sibling of wfc-forecast-chart rather than a mode of it: that
+ * Deliberately a sibling of pmc-forecast-chart rather than a mode of it: that
  * component is a fixed-width-per-item horizontal scroller with one header and
  * footer element per data point, which is exactly wrong for ~180 two-minute
  * segments. This strip fits its container, renders no per-item DOM, and lets
@@ -49,7 +49,7 @@ export class WfcNowcast extends LitElement {
   private refreshTimer: number | undefined;
 
   // Light DOM, matching the repo convention — the single global stylesheet
-  // styles every component (see wfc-forecast-chart et al.).
+  // styles every component (see pmc-forecast-chart et al.).
   protected createRenderRoot(): HTMLElement | DocumentFragment {
     return this;
   }

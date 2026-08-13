@@ -23,7 +23,7 @@ import {
   useAmPm,
 } from "../helpers";
 
-@customElement("wfc-forecast-header-items")
+@customElement("pmc-forecast-header-items")
 export class WfcForecastHeaderItems extends LitElement {
   @property({ attribute: false }) hass!: ExtendedHomeAssistant;
   @property({ attribute: false }) forecast!: ForecastAttribute;
@@ -83,12 +83,12 @@ export class WfcForecastHeaderItems extends LitElement {
             >`
           : nothing}
       </div>
-      <wfc-weather-condition-icon-provider
+      <pmc-weather-condition-icon-provider
         .hass=${this.hass}
         .config=${this.config}
         .state=${this.forecast.condition}
         .isNightTime=${isNightTime}
-      ></wfc-weather-condition-icon-provider>
+      ></pmc-weather-condition-icon-provider>
     `;
   }
 
@@ -215,6 +215,6 @@ export class WfcForecastHeaderItems extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "wfc-forecast-header-items": WfcForecastHeaderItems;
+    "pmc-forecast-header-items": WfcForecastHeaderItems;
   }
 }

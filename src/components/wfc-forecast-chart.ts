@@ -104,7 +104,7 @@ const DEFAULT_CHART_HEIGHT = 130;
  * Note: As canvas width limits vary between browsers, this component enforces a conservative
  * hard maximum canvas width (MAX_CANVAS_WIDTH) chosen to provide broad browser compatibility.
  */
-@customElement("wfc-forecast-chart")
+@customElement("pmc-forecast-chart")
 export class WfcForecastChart extends LitElement {
   @property({ attribute: false }) hass!: ExtendedHomeAssistant;
   @property({ attribute: false }) weatherEntity!: WeatherEntity;
@@ -229,13 +229,13 @@ export class WfcForecastChart extends LitElement {
                 </ha-button>
               </div>`
           : nothing}
-        <wfc-chart-attribute-selector
+        <pmc-chart-attribute-selector
           .open=${this._settingsOpen}
           .options=${this._getChartOptions()}
           .value=${this._selectedAttribute}
           @selected=${this._onAttributesSelected}
           @closed=${this._onSettingsClosed}
-        ></wfc-chart-attribute-selector>
+        ></pmc-chart-attribute-selector>
       </div>
       <div
         class="${classMap({
@@ -261,7 +261,7 @@ export class WfcForecastChart extends LitElement {
 
           <div class="wfc-chart-clipper" style=${styleMap(clipperStyle)}>
             <div
-              class="wfc-forecast-chart"
+              class="pmc-forecast-chart"
               id="chart-container"
               style=${styleMap(canvasStyle)}
             >
@@ -273,13 +273,13 @@ export class WfcForecastChart extends LitElement {
             ${forecast.map(
               (item, index) => html`
                 <div class="wfc-forecast-slot" data-index=${index}>
-                  <wfc-forecast-info
+                  <pmc-forecast-info
                     .hass=${this.hass}
                     .weatherEntity=${this.weatherEntity}
                     .forecast=${item}
                     .config=${this.config}
                     .hidePrecipitation=${true}
-                  ></wfc-forecast-info>
+                  ></pmc-forecast-info>
                 </div>
               `
             )}
@@ -872,13 +872,13 @@ export class WfcForecastChart extends LitElement {
 
       parts.push(html`
         <div class="wfc-forecast-slot" data-index=${index}>
-          <wfc-forecast-header-items
+          <pmc-forecast-header-items
             .hass=${this.hass}
             .forecast=${item}
             .forecastType=${this.forecastType}
             .isTwiceDailyEntity=${this.isTwiceDailyEntity}
             .config=${this.config}
-          ></wfc-forecast-header-items>
+          ></pmc-forecast-header-items>
         </div>
       `);
     });
@@ -1038,6 +1038,6 @@ export class WfcForecastChart extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "wfc-forecast-chart": WfcForecastChart;
+    "pmc-forecast-chart": WfcForecastChart;
   }
 }

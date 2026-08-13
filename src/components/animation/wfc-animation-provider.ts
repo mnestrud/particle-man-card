@@ -97,7 +97,7 @@ type Cloud = {
 
 type WeatherParticle = Snowflake | Raindrop | Star | SunRay | Cloud;
 
-@customElement("wfc-animation-provider")
+@customElement("pmc-animation-provider")
 export class WeatherAnimationProvider extends LitElement {
   @property({ attribute: false }) hass!: ExtendedHomeAssistant;
   @property({ attribute: false }) weatherEntity!: WeatherEntity;

@@ -7,7 +7,7 @@ import { ExtendedHomeAssistant, WeatherForecastCardConfig } from "../types";
 import { logger } from "../logger";
 import "./wfc-wind-indicator";
 
-@customElement("wfc-forecast-info")
+@customElement("pmc-forecast-info")
 export class WfcForecastInfo extends LitElement {
   @property({ attribute: false }) hass!: ExtendedHomeAssistant;
   @property({ attribute: false }) weatherEntity!: WeatherEntity;
@@ -72,12 +72,12 @@ export class WfcForecastInfo extends LitElement {
         <span class="wfc-forecast-extra-solar wfc-secondary">${display}</span>
       `;
     } else if (attribute === "wind_bearing" || attribute === "wind_direction") {
-      return html`<wfc-wind-indicator
+      return html`<pmc-wind-indicator
         .hass=${this.hass}
         .weatherEntity=${this.weatherEntity}
         .forecast=${this.forecast}
         .type="${attribute === "wind_direction" ? "direction" : "bearing"}"
-      ></wfc-wind-indicator>`;
+      ></pmc-wind-indicator>`;
     } else {
       logger.warn(`Unsupported forecast.extra_attribute: ${attribute}`);
     }
@@ -88,6 +88,6 @@ export class WfcForecastInfo extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "wfc-forecast-info": WfcForecastInfo;
+    "pmc-forecast-info": WfcForecastInfo;
   }
 }

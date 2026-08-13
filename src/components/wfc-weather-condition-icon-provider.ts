@@ -10,7 +10,7 @@ import { styleMap } from "lit/directives/style-map.js";
 import { customElement, property } from "lit/decorators.js";
 import { WeatherForecastCardConfig } from "../types";
 
-@customElement("wfc-weather-condition-icon-provider")
+@customElement("pmc-weather-condition-icon-provider")
 export class WfcWeatherConditionIconProvider extends LitElement {
   @property({ attribute: false }) public config!: WeatherForecastCardConfig;
   @property({ attribute: false }) public classes?: string;
@@ -278,6 +278,6 @@ const getWeatherStateSVG = (
 
 declare global {
   interface HTMLElementTagNameMap {
-    "wfc-weather-condition-icon-provider": WfcWeatherConditionIconProvider;
+    "pmc-weather-condition-icon-provider": WfcWeatherConditionIconProvider;
   }
 }
