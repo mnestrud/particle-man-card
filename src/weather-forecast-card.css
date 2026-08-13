@@ -1183,17 +1183,29 @@ button.pmc-footer {
 }
 
 .pmc-chart-band-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: calc(100% - 4px);
   height: var(--pmc-band-height);
   border-radius: var(--pmc-band-radius);
   background: var(--row-color, transparent);
 }
 
+/* Row identity: flower/smokestack in the leftmost cell only. Google's band
+ * palette is bright, so a translucent black glyph reads on every fill; an
+ * empty (transparent) first cell falls back to the theme's secondary color. */
+.pmc-chart-band-cell ha-icon {
+  --mdc-icon-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.pmc-chart-band-cell.empty ha-icon {
+  color: var(--secondary-text-color);
+}
+
 .pmc-forecast-header {
   margin-top: var(--pmc-panel-gap);
 }
 
-/* Vertical swipes scroll the dashboard; only horizontal drags scrub. */
-.pmc-forecast-chart canvas {
-  touch-action: pan-y;
-}
+

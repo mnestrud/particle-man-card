@@ -451,6 +451,11 @@ export class WeatherForecastCard extends LitElement {
     if (changedProps.has("_currentForecastType")) {
       if (this._forecastContainer) {
         this.layoutForecastItems(this._forecastContainer.clientWidth);
+        // A view keeps the previous view's scrollLeft otherwise — a deep
+        // hourly scroll left the 5-day view clamped past its first day.
+        this._forecastContainer
+          .querySelector(".wfc-scroll-container")
+          ?.scrollTo({ left: 0 });
       }
     }
   }

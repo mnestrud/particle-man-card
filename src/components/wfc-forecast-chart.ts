@@ -295,16 +295,26 @@ export class WfcForecastChart extends LitElement {
               (row) => html`
                 <div class="pmc-chart-band-row">
                   ${row.cells.map(
-                    (cell) => html`
+                    (cell, index) => html`
                       <div class="pmc-band-slot">
                         <div
-                          class="pmc-chart-band-cell"
+                          class="pmc-chart-band-cell ${cell.color
+                            ? ""
+                            : "empty"}"
                           title=${cell.label ?? ""}
                           aria-label=${cell.label ?? ""}
                           style=${styleMap({
                             "--row-color": cell.color ?? "transparent",
                           })}
-                        ></div>
+                        >
+                          ${index === 0
+                            ? html`<ha-icon
+                                .icon=${row.key === "pollen"
+                                  ? "mdi:flower-pollen"
+                                  : "mdi:factory"}
+                              ></ha-icon>`
+                            : nothing}
+                        </div>
                       </div>
                     `
                   )}
@@ -403,9 +413,11 @@ export class WfcForecastChart extends LitElement {
     const baseOptions: ChartOptions = {
       responsive: true,
       maintainAspectRatio: false,
-      // Tap snaps to the nearest slot, horizontal drag scrubs; the chart body
-      // owns this gesture now that view cycling lives in the panel header.
+      // Tap/hover snaps the tooltip to the nearest slot. touchmove is
+      // deliberately NOT handled: on a scrollable chart, horizontal drags
+      // must scroll — scrubbing lost that fight on mobile.
       interaction: { mode: "index", intersect: false },
+      events: ["mousemove", "mouseout", "click", "touchstart"],
       plugins: {
         datalabels: {
           font: {
