@@ -151,3 +151,29 @@ describe("summarizeNowcast", () => {
     expect(summarizeNowcast([], T0).allDry).toBe(true);
   });
 });
+
+describe("summarizeNowcast probability", () => {
+  const now = new Date("2026-08-13T20:00:00Z");
+  it("quotes the peak probability of the upcoming wet run", () => {
+    const summary = summarizeNowcast(
+      [
+        { datetime: "2026-08-13T20:00:00Z", precipitation: 0 },
+        { datetime: "2026-08-13T20:05:00Z", precipitation: 0.5, probability: 30 },
+        { datetime: "2026-08-13T20:07:00Z", precipitation: 1.1, probability: 52 },
+        { datetime: "2026-08-13T20:09:00Z", precipitation: 0 },
+        // A later, separate run must not contribute its probability.
+        { datetime: "2026-08-13T20:30:00Z", precipitation: 2.0, probability: 90 },
+      ],
+      now
+    );
+    expect(summary.probability).toBe(52);
+  });
+
+  it("is null when entries carry no probability (sensor-path data)", () => {
+    const summary = summarizeNowcast(
+      [{ datetime: "2026-08-13T20:05:00Z", precipitation: 0.5 }],
+      now
+    );
+    expect(summary.probability).toBeNull();
+  });
+});
