@@ -1183,25 +1183,53 @@ button.pmc-footer {
 }
 
 .pmc-chart-band-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: calc(100% - 4px);
   height: var(--pmc-band-height);
   border-radius: var(--pmc-band-radius);
   background: var(--row-color, transparent);
 }
 
-/* Row identity: flower/smokestack in the leftmost cell only. Google's band
- * palette is bright, so a translucent black glyph reads on every fill; an
- * empty (transparent) first cell falls back to the theme's secondary color. */
-.pmc-chart-band-cell ha-icon {
-  --mdc-icon-size: 12px;
-  color: rgba(0, 0, 0, 0.55);
+/* Row identity: a sticky badge at the row's left edge (same trick as the
+ * day indicators) — independent of cell colors, visible while scrolling,
+ * and it consumes no slot width thanks to the negative margin. */
+.pmc-band-icon {
+  position: sticky;
+  left: 2px;
+  z-index: 3;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--card-background-color);
+  border: 1px solid var(--divider-color);
+  margin-right: -20px;
+  flex-shrink: 0;
+  pointer-events: none;
 }
 
-.pmc-chart-band-cell.empty ha-icon {
+.pmc-band-icon ha-icon {
+  --mdc-icon-size: 11px;
   color: var(--secondary-text-color);
+  display: flex;
+}
+
+/* Tap tooltip for band cells (mobile has no hover). */
+.pmc-band-tip {
+  position: fixed;
+  z-index: 20;
+  transform: translate(-50%, -130%);
+  background: var(--card-background-color);
+  color: var(--primary-text-color);
+  border: 1px solid var(--divider-color);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: var(--pmc-font-meta);
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
 }
 
 .pmc-forecast-header {

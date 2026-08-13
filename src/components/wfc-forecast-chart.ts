@@ -121,6 +121,9 @@ export class WfcForecastChart extends LitElement {
   @query("canvas") private _canvas?: HTMLCanvasElement;
 
   @state() private _settingsOpen = false;
+  @state() private _bandTip: { label: string; x: number; y: number } | null =
+    null;
+  private _bandTipTimer?: number;
   @state() private _selectedAttribute: ChartAttributes =
     DEFAULT_CHART_ATTRIBUTE;
 
@@ -138,6 +141,7 @@ export class WfcForecastChart extends LitElement {
 
   public disconnectedCallback(): void {
     super.disconnectedCallback();
+    window.clearTimeout(this._bandTipTimer);
     this._chart?.destroy();
     this._chart = null;
   }
@@ -294,27 +298,26 @@ export class WfcForecastChart extends LitElement {
             .map(
               (row) => html`
                 <div class="pmc-chart-band-row">
+                  <div class="pmc-band-icon">
+                    <ha-icon
+                      .icon=${row.key === "pollen"
+                        ? "mdi:flower-pollen"
+                        : "mdi:factory"}
+                    ></ha-icon>
+                  </div>
                   ${row.cells.map(
-                    (cell, index) => html`
+                    (cell) => html`
                       <div class="pmc-band-slot">
                         <div
-                          class="pmc-chart-band-cell ${cell.color
-                            ? ""
-                            : "empty"}"
+                          class="pmc-chart-band-cell"
                           title=${cell.label ?? ""}
                           aria-label=${cell.label ?? ""}
+                          @click=${(ev: MouseEvent) =>
+                            this.showBandTip(ev, cell.label)}
                           style=${styleMap({
                             "--row-color": cell.color ?? "transparent",
                           })}
-                        >
-                          ${index === 0
-                            ? html`<ha-icon
-                                .icon=${row.key === "pollen"
-                                  ? "mdi:flower-pollen"
-                                  : "mdi:factory"}
-                              ></ha-icon>`
-                            : nothing}
-                        </div>
+                        ></div>
                       </div>
                     `
                   )}
@@ -323,7 +326,33 @@ export class WfcForecastChart extends LitElement {
             )}
         </div>
       </div>
+      ${this._bandTip
+        ? html`<div
+            class="pmc-band-tip"
+            style=${styleMap({
+              left: `${this._bandTip.x}px`,
+              top: `${this._bandTip.y}px`,
+            })}
+          >
+            ${this._bandTip.label}
+          </div>`
+        : nothing}
     `;
+  }
+
+  /**
+   * Tap-to-tooltip for the band cells: native `title` is hover-only, so a
+   * tap shows a short-lived floating bubble at the touch point instead.
+   */
+  private showBandTip(ev: MouseEvent, label: string | null): void {
+    if (!label) {
+      return;
+    }
+    window.clearTimeout(this._bandTipTimer);
+    this._bandTip = { label, x: ev.clientX, y: ev.clientY };
+    this._bandTipTimer = window.setTimeout(() => {
+      this._bandTip = null;
+    }, 3500);
   }
 
   private initChart(): void {
