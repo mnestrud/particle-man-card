@@ -30,7 +30,6 @@ export class WfcAirQuality extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @property({ attribute: false }) public discovery?: DiscoveryResult;
 
-  @state() private showHealth = false;
   @state() private showQuiet = false;
 
   protected createRenderRoot(): HTMLElement | DocumentFragment {
@@ -62,17 +61,6 @@ export class WfcAirQuality extends LitElement {
 
     const aqiAttrs = (aqi?.state.attributes ?? {}) as Record<string, unknown>;
     const trend = typeof aqiAttrs.trend === "string" ? aqiAttrs.trend : "";
-    const health = aqiAttrs.health_recommendations;
-    const healthText =
-      typeof health === "string"
-        ? health
-        : typeof health === "object" && health !== null
-          ? String(
-              (health as Record<string, unknown>).generalPopulation ??
-                (health as Record<string, unknown>).general_population ??
-                ""
-            )
-          : "";
 
     const bySeverity = (a: ClassifiedEntity, b: ClassifiedEntity) =>
       (severityOf(b) ?? -1) - (severityOf(a) ?? -1);
@@ -103,21 +91,6 @@ export class WfcAirQuality extends LitElement {
               ${quiet.map((p) => this.shortName(p)).join(" · ")}
               ${this.showQuiet ? "▴" : "▾"}
             </button>`
-          : nothing}
-        ${healthText
-          ? html`
-              <button
-                class="pmc-footer"
-                @click=${() => (this.showHealth = !this.showHealth)}
-                aria-expanded=${this.showHealth}
-              >
-                ${localize(this.hass, "air_quality.health")}
-                ${this.showHealth ? "▴" : "▾"}
-              </button>
-              ${this.showHealth
-                ? html`<div class="pmc-health">${healthText}</div>`
-                : nothing}
-            `
           : nothing}
       </div>
     `;

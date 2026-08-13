@@ -12,15 +12,25 @@ import { ForecastAttribute } from "./weather";
  * numeric per-entry `severity` — no thresholds or vocabularies here.
  */
 
+export interface BandCell {
+  color: string | null;
+  /** Tooltip text: what is being forecast in this slot. */
+  label: string | null;
+}
+
 export interface BandRow {
   key: string;
-  colors: (string | null)[];
+  cells: BandCell[];
 }
 
 interface SeriesEntry {
   datetime?: string;
   color_hex?: string | null;
   severity?: number | null;
+  aqi?: number | null;
+  category?: string | null;
+  index?: number | null;
+  dominant_pollutant?: string | null;
 }
 
 const hourKey = (iso: string | undefined): number | null => {
@@ -54,6 +64,24 @@ const seriesOf = (
   return Array.isArray(series) ? (series as SeriesEntry[]) : [];
 };
 
+const slotTime = (
+  hass: HomeAssistant,
+  iso: string | undefined,
+  granularity: "hourly" | "daily"
+): string => {
+  if (!iso) {
+    return "";
+  }
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  const language = hass.locale?.language;
+  return granularity === "hourly"
+    ? date.toLocaleString(language, { weekday: "short", hour: "numeric" })
+    : date.toLocaleDateString(language, { weekday: "short" });
+};
+
 export const buildForecastBands = (
   hass: HomeAssistant,
   discovery: Record<string, DiscoveryResult>,
@@ -74,56 +102,92 @@ export const buildForecastBands = (
         aqi.state.attributes as Record<string, unknown>,
         granularity === "hourly" ? "hourly_forecast" : "daily_forecast"
       );
-      const byKey = new Map<number | string, string | null>();
+      const byKey = new Map<number | string, SeriesEntry>();
       for (const entry of series) {
         const key = keyOf(entry.datetime);
         if (key !== null && typeof entry.color_hex === "string") {
-          byKey.set(key, entry.color_hex);
+          byKey.set(key, entry);
         }
       }
-      const colors = slots.map((slot) => {
+      const cells: BandCell[] = slots.map((slot) => {
         const key = keyOf(slot.datetime);
-        return key === null ? null : (byKey.get(key) ?? null);
+        const entry = key === null ? undefined : byKey.get(key);
+        if (!entry) {
+          return { color: null, label: null };
+        }
+        const parts = [
+          typeof entry.aqi === "number" ? `AQI ${entry.aqi}` : null,
+          entry.category ?? null,
+          entry.dominant_pollutant
+            ? entry.dominant_pollutant.toUpperCase()
+            : null,
+        ].filter(Boolean);
+        return {
+          color: entry.color_hex ?? null,
+          label: `${slotTime(hass, slot.datetime, granularity)} — ${parts.join(" · ")}`,
+        };
       });
-      if (colors.some(Boolean)) {
-        rows.push({ key: "air_quality", colors });
+      if (cells.some((cell) => cell.color)) {
+        rows.push({ key: "air_quality", cells });
       }
     }
   }
 
-  // Pollen forecasts are daily-only; each day shows the worst (highest
-  // severity) entry across the tree/grass/weed type sensors.
+  // Pollen forecasts are daily-only; each day is colored by the worst
+  // (highest severity) type, and the tooltip lists every type forecast.
   const pollenEntities = discovery.pollen?.entities;
   if (granularity === "daily" && pollenEntities) {
     const { types } = classifyPollen(hass, pollenEntities);
-    const worst = new Map<string, { severity: number; color: string | null }>();
+    const byDay = new Map<
+      string,
+      { name: string; severity: number; color: string | null; index: number | null; category: string | null }[]
+    >();
     for (const type of types) {
-      const series = seriesOf(
-        type.state.attributes as Record<string, unknown>,
-        "daily_forecast"
+      const attrs = type.state.attributes as Record<string, unknown>;
+      const name = String(attrs.friendly_name ?? type.entityId).replace(
+        /\s*Pollen$/i,
+        ""
       );
+      const series = seriesOf(attrs, "daily_forecast");
       for (const entry of series) {
         const key = dayKey(entry.datetime);
         const severity = typeof entry.severity === "number" ? entry.severity : null;
         if (key === null || severity === null) {
           continue;
         }
-        const current = worst.get(key);
-        if (!current || severity > current.severity) {
-          worst.set(key, {
-            severity,
-            color: typeof entry.color_hex === "string" ? entry.color_hex : null,
-          });
-        }
+        const list = byDay.get(key) ?? [];
+        list.push({
+          name,
+          severity,
+          color: typeof entry.color_hex === "string" ? entry.color_hex : null,
+          index: typeof entry.index === "number" ? entry.index : null,
+          category: entry.category ?? null,
+        });
+        byDay.set(key, list);
       }
     }
-    if (worst.size) {
-      const colors = slots.map((slot) => {
+    if (byDay.size) {
+      const cells: BandCell[] = slots.map((slot) => {
         const key = dayKey(slot.datetime);
-        return key === null ? null : (worst.get(key)?.color ?? null);
+        const list = key === null ? undefined : byDay.get(key);
+        if (!list?.length) {
+          return { color: null, label: null };
+        }
+        const sorted = [...list].sort((a, b) => b.severity - a.severity);
+        const breakdown = sorted
+          .map((t) =>
+            [t.name, t.index !== null ? String(t.index) : null, t.category]
+              .filter(Boolean)
+              .join(" ")
+          )
+          .join(" · ");
+        return {
+          color: sorted[0]!.color,
+          label: `${slotTime(hass, slot.datetime, granularity)} — ${breakdown}`,
+        };
       });
-      if (colors.some(Boolean)) {
-        rows.push({ key: "pollen", colors });
+      if (cells.some((cell) => cell.color)) {
+        rows.push({ key: "pollen", cells });
       }
     }
   }

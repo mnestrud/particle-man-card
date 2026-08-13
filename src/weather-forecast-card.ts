@@ -338,14 +338,30 @@ export class WeatherForecastCard extends LitElement {
 
     if (showForecast) {
       if (isChart) {
-        // Optional settings bar + 130px chart + header/footer labels.
-        rows += 3;
+        // Header switcher + optional settings bar + 130px chart +
+        // header/footer labels + harmonized bands.
+        rows += 4;
         minRows += 3;
       } else {
         // Simple forecast column (time + icon + temperature + precipitation).
         rows += 2;
         minRows += 2;
       }
+    }
+
+    // Fork panels. Estimates only — the min-height:100% card background grows
+    // with real content, so an off-estimate adds whitespace, never clipping.
+    if (this.config?.air_quality) {
+      // Hero + scale + a few pollutant bars + footer.
+      rows += 3;
+    }
+    if (this.config?.pollen) {
+      // Hero + type/plant bars + footer; collapses to the hero on quiet days.
+      rows += 2;
+    }
+    if (this.config?.nowcast) {
+      // Callout + strip, present only when precipitation is expected.
+      rows += 1;
     }
 
     return {

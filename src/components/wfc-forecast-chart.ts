@@ -290,17 +290,19 @@ export class WfcForecastChart extends LitElement {
           </div>
 
           ${this.bandRows
-            .filter((row) => row.colors.length === forecast.length)
+            .filter((row) => row.cells.length === forecast.length)
             .map(
               (row) => html`
                 <div class="pmc-chart-band-row">
-                  ${row.colors.map(
-                    (color) => html`
+                  ${row.cells.map(
+                    (cell) => html`
                       <div class="pmc-band-slot">
                         <div
                           class="pmc-chart-band-cell"
+                          title=${cell.label ?? ""}
+                          aria-label=${cell.label ?? ""}
                           style=${styleMap({
-                            "--row-color": color ?? "transparent",
+                            "--row-color": cell.color ?? "transparent",
                           })}
                         ></div>
                       </div>

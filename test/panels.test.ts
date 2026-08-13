@@ -316,21 +316,4 @@ describe("wfc-air-quality", () => {
     expect(footer?.textContent).toContain("Ozone");
   });
 
-  it("expands health recommendations on demand", async () => {
-    const el = await fixture<WfcAirQuality>(
-      html`<wfc-air-quality
-        .hass=${aqHass()}
-        .discovery=${AQ_DISCOVERY}
-      ></wfc-air-quality>`
-    );
-    await el.updateComplete;
-
-    expect(el.querySelector(".pmc-health")).toBeNull();
-    const toggles = el.querySelectorAll<HTMLButtonElement>("button.pmc-footer");
-    toggles[toggles.length - 1]?.click();
-    await el.updateComplete;
-    expect(el.querySelector(".pmc-health")?.textContent).toContain(
-      "Enjoy the outdoors"
-    );
-  });
 });
