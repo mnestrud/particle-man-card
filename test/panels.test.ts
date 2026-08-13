@@ -307,8 +307,10 @@ describe("wfc-air-quality", () => {
     const rows = el.querySelectorAll(".pmc-row");
     expect(rows).toHaveLength(1);
     expect(rows[0]?.textContent).toContain("PM2.5");
-    expect(rows[0]?.querySelector(".pmc-chip")?.textContent).toContain(
-      "dominant"
+    // Dominance lives in the hero meta line, not a row chip (chips overflow
+    // the fixed label column).
+    expect(el.querySelector(".pmc-hero-meta")?.textContent).toContain(
+      "PM2.5 dominant"
     );
     const footer = el.querySelector("button.pmc-footer");
     expect(footer?.textContent).toContain("Ozone");

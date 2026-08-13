@@ -715,6 +715,8 @@ weather-forecast-card {
   flex-direction: column;
   gap: var(--ha-space-2, 8px);
   margin-top: var(--pmc-panel-gap);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .pmc-panel-title {
@@ -769,7 +771,12 @@ weather-forecast-card {
 .pmc-hero {
   display: flex;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: var(--ha-space-2, 8px);
+}
+
+.pmc-hero-category {
+  min-width: 0;
 }
 
 .pmc-hero-value {
@@ -838,7 +845,10 @@ weather-forecast-card {
 
 .pmc-row {
   display: grid;
-  grid-template-columns: var(--pmc-label-col) 1fr var(--pmc-value-col);
+  grid-template-columns:
+    minmax(0, var(--pmc-label-col))
+    minmax(0, 1fr)
+    minmax(var(--pmc-value-col), auto);
   align-items: center;
   column-gap: var(--pmc-row-gap);
   min-height: var(--pmc-row-stride);
@@ -1158,6 +1168,7 @@ button.pmc-footer {
  * so bands stay aligned with the scrolled chart columns. */
 .pmc-chart-band-row {
   display: flex;
+  column-gap: var(--forecast-item-gap);
   margin-top: var(--pmc-band-gap);
 }
 

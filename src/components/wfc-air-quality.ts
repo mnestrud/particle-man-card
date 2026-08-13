@@ -84,7 +84,7 @@ export class WfcAirQuality extends LitElement {
         <span class="pmc-panel-title">
           ${localize(this.hass, "air_quality.title")}
         </span>
-        ${aqi ? this.renderHero(aqi, trend) : nothing}
+        ${aqi ? this.renderHero(aqi, trend, pollutants) : nothing}
         ${active.length || (this.showQuiet && quiet.length)
           ? html`<div class="pmc-rows">
               ${active.map((p) => this.renderPollutant(p))}
@@ -123,11 +123,19 @@ export class WfcAirQuality extends LitElement {
     `;
   }
 
-  private renderHero(aqi: ClassifiedEntity, trend: string): TemplateResult {
+  private renderHero(
+    aqi: ClassifiedEntity,
+    trend: string,
+    pollutants: ClassifiedEntity[]
+  ): TemplateResult {
     const color = colorOf(aqi);
-    const meta = [localize(this.hass, "air_quality.universal_aqi"), trend]
-      .filter(Boolean)
-      .join(" · ");
+    const dominant = pollutants.find(
+      (p) => p.state.attributes.is_dominant === true
+    );
+    const dominantText = dominant
+      ? `${this.shortName(dominant)} ${localize(this.hass, "air_quality.dominant_chip")}`
+      : localize(this.hass, "air_quality.universal_aqi");
+    const meta = [dominantText, trend].filter(Boolean).join(" · ");
     return html`
       <div
         class="pmc-hero"
@@ -148,7 +156,6 @@ export class WfcAirQuality extends LitElement {
   }
 
   private renderPollutant(pollutant: ClassifiedEntity): TemplateResult {
-    const dominant = pollutant.state.attributes.is_dominant === true;
     return barRow({
       label: this.shortName(pollutant),
       color: colorOf(pollutant),
@@ -156,9 +163,6 @@ export class WfcAirQuality extends LitElement {
       severityMax: severityMaxOf(pollutant),
       value: pollutant.state.state,
       unit: (pollutant.state.attributes.unit_of_measurement as string) ?? "",
-      chip: dominant
-        ? localize(this.hass, "air_quality.dominant_chip")
-        : undefined,
     });
   }
 }
