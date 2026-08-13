@@ -1,0 +1,88 @@
+/*
+ * Particle Man Card — design tokens (source of truth for the redesign).
+ *
+ * Two layers:
+ *   1. Theme layer — Graphite Auto values (light + dark) behind the same HA
+ *      variable names the card consumes at runtime. In HA these come from the
+ *      live theme; the literals here exist only so mockups render faithfully.
+ *   2. Card layer (--pmc-*) — the redesign's own scale: type ramp, bar
+ *      geometry, spacing rhythm. These ship to weather-forecast-card.css.
+ *
+ * Severity colors are NOT defined here: every fill comes from the entity's
+ * color_hex / the integration's canonical palettes, passed in as inline
+ * custom properties per row (--row-color). The card owns geometry, never
+ * thresholds.
+ */
+
+[data-theme="light"] {
+  --card-background-color: rgb(255, 255, 255);
+  --primary-background-color: rgb(234, 235, 238);
+  --primary-text-color: rgba(19, 21, 54, 1);
+  --secondary-text-color: rgba(19, 21, 54, 0.6);
+  --divider-color: rgba(19, 21, 54, 0.1);
+  --primary-color: rgb(238, 147, 0);
+  --disabled-color: rgb(189, 189, 189);
+  --error-color: rgb(234, 114, 135);
+  --warning-color: rgb(255, 219, 117);
+  --success-color: rgb(32, 126, 71);
+  --info-color: rgb(39, 209, 246);
+  --ha-card-border-radius: 20px;
+}
+
+[data-theme="dark"] {
+  --card-background-color: rgb(35, 36, 43);
+  --primary-background-color: rgb(16, 18, 21);
+  --primary-text-color: rgb(228, 228, 231);
+  --secondary-text-color: rgb(138, 140, 153);
+  --divider-color: rgba(228, 228, 231, 0.1);
+  --primary-color: rgb(224, 138, 0);
+  --disabled-color: rgb(61, 65, 85);
+  --error-color: rgb(234, 114, 135);
+  --warning-color: rgb(255, 219, 117);
+  --success-color: rgb(118, 214, 152);
+  --info-color: rgb(39, 209, 246);
+  --ha-card-border-radius: 20px;
+}
+
+:root {
+  /* --- Type ramp ---------------------------------------------------------- */
+  --pmc-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --pmc-font-hero: 28px;          /* panel hero numeral (AQI value, advisory) */
+  --pmc-font-hero-weight: 650;
+  --pmc-font-headline: 15px;      /* category word beside a hero */
+  --pmc-font-row: 13px;           /* bar-row labels and values */
+  --pmc-font-meta: 11px;          /* footers, axis labels, timestamps */
+  --pmc-font-title: 11px;         /* small-caps panel titles */
+  --pmc-title-tracking: 0.08em;
+
+  /* --- Bar geometry -------------------------------------------------------
+   * One row grammar everywhere:  label | bar | value
+   * Fixed label/value columns so bars align vertically across ALL panels —
+   * this alignment is what makes "dense" read as designed, not cramped.
+   */
+  --pmc-bar-height: 8px;
+  --pmc-bar-radius: 4px;
+  --pmc-bar-track-mix: 16%;       /* track = color-mix(row color N%, transparent) */
+  --pmc-label-col: 76px;
+  --pmc-value-col: 84px;
+  --pmc-row-gap: 10px;            /* horizontal gap between row cells */
+  --pmc-row-stride: 26px;         /* vertical rhythm of bar rows */
+
+  /* --- Segmented scale bar (panel heroes) --------------------------------- */
+  --pmc-segment-height: 10px;
+  --pmc-segment-gap: 3px;
+  --pmc-segment-radius: 3px;
+
+  /* --- Band strips (harmonized forecast, nowcast) ------------------------- */
+  --pmc-band-height: 14px;
+  --pmc-band-gap: 1px;
+  --pmc-band-radius: 3px;
+
+  /* --- Spacing rhythm ------------------------------------------------------ */
+  --pmc-space-1: 4px;
+  --pmc-space-2: 8px;
+  --pmc-space-3: 12px;
+  --pmc-space-4: 16px;
+  --pmc-panel-gap: 18px;          /* between panels — replaces hairline dividers */
+}

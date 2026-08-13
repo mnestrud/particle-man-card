@@ -1,0 +1,111 @@
+<!-- @dsCard group="Particle Man Card" -->
+<title>Full card — quiet day (your real data)</title>
+<link rel="stylesheet" href="tokens.css" />
+<link rel="stylesheet" href="shared.css" />
+<style>
+  body { background: #808289; }
+  .mock-stage { background: var(--primary-background-color); padding: 20px; border-radius: 12px; }
+  .tempchart { width: 100%; height: 84px; display: block; }
+  .bandrow { display: grid; grid-template-columns: var(--pmc-label-col) 1fr; column-gap: var(--pmc-row-gap); align-items: center; }
+  .bandrow .pmc-panel-title { font-size: 10px; }
+</style>
+
+<div class="mock-pair">
+  <div class="mock-col" data-theme="light">
+    <span class="tag">Light</span>
+    <div class="mock-stage"><div class="ha-card" id="card-light"></div></div>
+  </div>
+  <div class="mock-col" data-theme="dark">
+    <span class="tag">Dark</span>
+    <div class="mock-stage"><div class="ha-card" id="card-dark"></div></div>
+  </div>
+</div>
+
+<template id="card-template">
+  <!-- No alert, nothing precipitating: alert banner and nowcast are simply
+       absent. Snapshot: 2026-08-13 - AQI 71 Good, all pollen Very Low. -->
+
+  <div class="pmc-current">
+    <span class="pmc-current-temp">76°</span>
+    <div class="pmc-current-cond">
+      <span class="state">Cloudy</span>
+      <span class="meta">Feels like 80° · H 84° L 70°</span>
+    </div>
+    <div class="pmc-current-attrs">
+      <span>Wind</span><b>ESE 4 mph</b>
+      <span>Gusts</span><b>8 mph</b>
+      <span>Humidity</span><b>83%</b>
+      <span>Pressure</span><b>29.96 inHg</b>
+    </div>
+  </div>
+
+  <div class="pmc-panel">
+    <div class="pmc-panel-header">
+      <span class="pmc-panel-title">Hourly forecast</span>
+      <span class="pmc-footer">tap to cycle daily · twice-daily</span>
+    </div>
+    <svg class="tempchart" viewBox="0 0 400 84" preserveAspectRatio="none" aria-hidden="true">
+      <polyline fill="none" stroke="var(--primary-color)" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round" points="" id="temppoly"/>
+    </svg>
+    <div class="pmc-axis"><span>3 PM</span><span>9 PM</span><span>3 AM</span><span>9 AM</span><span>3 PM</span></div>
+    <div class="bandrow">
+      <span class="pmc-panel-title">Air quality</span>
+      <div class="pmc-bands" id="aqband"></div>
+    </div>
+  </div>
+
+  <div class="pmc-panel">
+    <span class="pmc-panel-title">Air quality</span>
+    <div class="pmc-hero" style="--row-color:#84cf33">
+      <span class="pmc-hero-value">71</span>
+      <span class="pmc-hero-category"><span class="pmc-swatch"></span>Good air quality</span>
+      <span class="pmc-hero-meta">Universal AQI · stable</span>
+    </div>
+    <div class="pmc-scale" style="--row-color:#84cf33">
+      <div class="pmc-scale-seg on"></div><div class="pmc-scale-seg on"></div>
+      <div class="pmc-scale-seg"></div><div class="pmc-scale-seg"></div>
+      <div class="pmc-scale-seg"></div>
+    </div>
+    <div class="pmc-rows">
+      <div class="pmc-row" style="--row-color:#ffff00">
+        <span class="pmc-row-label">PM2.5<span class="pmc-chip">dominant</span></span>
+        <div class="pmc-row-bar"><div class="pmc-row-bar-fill" style="width:20%"></div></div>
+        <span class="pmc-row-value"><b>18.1</b><span class="unit">µg/m³</span></span>
+      </div>
+    </div>
+    <div class="pmc-footer">Good: O₃ · PM10 · NO₂ · SO₂ · CO — details ▾</div>
+  </div>
+
+  <div class="pmc-panel">
+    <span class="pmc-panel-title">Pollen</span>
+    <div class="pmc-hero" style="--row-color:#009e3a">
+      <span class="pmc-hero-value" style="font-size:22px">Very Low</span>
+      <span class="pmc-hero-category"><span class="pmc-swatch"></span>all types quiet</span>
+      <span class="pmc-hero-meta">Tree · Weed at 1 — details ▾</span>
+    </div>
+  </div>
+</template>
+
+<script>
+  const temps = [76,76,75,75,74,74,73,73,74,75,77,79,81,83,84,84,83,82,80,79,78,77,77,76];
+  const tMin = 73, tMax = 84;
+  const points = temps.map((t, i) =>
+    `${(i / (temps.length - 1)) * 400},${74 - ((t - tMin) / (tMax - tMin)) * 62}`).join(" ");
+  // Real hourly UAQI categories from the snapshot (Good with Moderate dips)
+  const aq = ["#84cf33","#84cf33","#84cf33","#84cf33","#84cf33","#84cf33","#ffff00","#ffff00",
+              "#84cf33","#ffff00","#84cf33","#84cf33","#84cf33","#84cf33","#84cf33","#84cf33",
+              "#84cf33","#84cf33","#84cf33","#84cf33","#84cf33","#84cf33","#84cf33","#84cf33"];
+
+  for (const host of [document.getElementById("card-light"), document.getElementById("card-dark")]) {
+    host.append(document.getElementById("card-template").content.cloneNode(true));
+    host.querySelector("#temppoly").setAttribute("points", points);
+    const aqBand = host.querySelector("#aqband");
+    for (const c of aq) {
+      const cell = document.createElement("div");
+      cell.className = "pmc-band";
+      cell.style.setProperty("--row-color", c);
+      aqBand.append(cell);
+    }
+  }
+</script>

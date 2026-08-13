@@ -1,0 +1,211 @@
+<!-- @dsCard group="Particle Man Card" -->
+<title>Full card — stormy, poor-air day</title>
+<link rel="stylesheet" href="tokens.css" />
+<link rel="stylesheet" href="shared.css" />
+<style>
+  body { background: #808289; }
+  .mock-stage {
+    background: var(--primary-background-color);
+    padding: 20px;
+    border-radius: 12px;
+  }
+  /* Page-local data styling: severity colors arrive inline per element,
+     exactly as the card will set --row-color from entity color_hex. */
+  .tempchart { width: 100%; height: 84px; display: block; }
+  .bandrow { display: grid; grid-template-columns: var(--pmc-label-col) 1fr; column-gap: var(--pmc-row-gap); align-items: center; }
+  .bandrow .pmc-panel-title { font-size: 10px; }
+</style>
+
+<div class="mock-pair">
+  <div class="mock-col" data-theme="light">
+    <span class="tag">Light</span>
+    <div class="mock-stage"><div class="ha-card" id="card-light"></div></div>
+  </div>
+  <div class="mock-col" data-theme="dark">
+    <span class="tag">Dark</span>
+    <div class="mock-stage"><div class="ha-card" id="card-dark"></div></div>
+  </div>
+</div>
+
+<template id="card-template">
+  <!-- ══ Weather alert ══ -->
+  <div class="pmc-alerts" style="--row-color:#ea7287">
+    <div class="pmc-alerts-banner">
+      <span class="pmc-chip">Severe</span>
+      Severe Thunderstorm Warning
+      <span style="margin-left:auto;font-weight:400;font-size:11px;color:var(--secondary-text-color)">until 4:30 PM</span>
+    </div>
+    <div class="pmc-alerts-body">
+      Winds to 60 mph and quarter-size hail possible. Move to an interior room
+      on the lowest floor of a sturdy building. · NWS Des Moines
+    </div>
+  </div>
+
+  <!-- ══ Current conditions ══ -->
+  <div class="pmc-current">
+    <span class="pmc-current-temp">82°</span>
+    <div class="pmc-current-cond">
+      <span class="state">Thunderstorms</span>
+      <span class="meta">Feels like 88° · H 88° L 71°</span>
+    </div>
+    <div class="pmc-current-attrs">
+      <span>Wind</span><b>SE 18 mph</b>
+      <span>Gusts</span><b>32 mph</b>
+      <span>Humidity</span><b>78%</b>
+      <span>Pressure</span><b>29.72 inHg</b>
+    </div>
+  </div>
+
+  <!-- ══ Nowcast ══ -->
+  <div class="pmc-panel">
+    <div class="pmc-strip-callout">
+      <span>Rain starting in 42 min</span>
+      <span class="meta">moderate–heavy · ending ~4:10 PM</span>
+    </div>
+    <div class="pmc-nowcast-bars" id="nowcast"></div>
+    <div class="pmc-axis"><span>Now</span><span>+2 h</span><span>+4 h</span><span>+6 h</span></div>
+  </div>
+
+  <!-- ══ Hourly forecast, harmonized ══ -->
+  <div class="pmc-panel">
+    <div class="pmc-panel-header">
+      <span class="pmc-panel-title">Hourly forecast</span>
+      <span class="pmc-footer">tap to cycle daily · twice-daily</span>
+    </div>
+    <svg class="tempchart" viewBox="0 0 400 84" preserveAspectRatio="none" aria-hidden="true">
+      <polyline fill="none" stroke="var(--primary-color)" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round" points="" id="temppoly"/>
+    </svg>
+    <div class="pmc-axis"><span>3 PM</span><span>9 PM</span><span>3 AM</span><span>9 AM</span><span>3 PM</span></div>
+    <div class="bandrow">
+      <span class="pmc-panel-title">Air quality</span>
+      <div class="pmc-bands" id="aqband"></div>
+    </div>
+    <div class="bandrow">
+      <span class="pmc-panel-title">Precip %</span>
+      <div class="pmc-bands" id="precipband"></div>
+    </div>
+  </div>
+
+  <!-- ══ Air quality ══ -->
+  <div class="pmc-panel">
+    <span class="pmc-panel-title">Air quality</span>
+    <div class="pmc-hero" style="--row-color:#ff8c00">
+      <span class="pmc-hero-value">34</span>
+      <span class="pmc-hero-category"><span class="pmc-swatch"></span>Low air quality</span>
+      <span class="pmc-hero-meta">Universal AQI · worsening</span>
+    </div>
+    <div class="pmc-scale" style="--row-color:#ff8c00">
+      <div class="pmc-scale-seg on"></div><div class="pmc-scale-seg on"></div>
+      <div class="pmc-scale-seg on"></div><div class="pmc-scale-seg on"></div>
+      <div class="pmc-scale-seg"></div>
+    </div>
+    <div class="pmc-rows">
+      <div class="pmc-row" style="--row-color:#ff0000">
+        <span class="pmc-row-label">O₃<span class="pmc-chip">dominant</span></span>
+        <div class="pmc-row-bar"><div class="pmc-row-bar-fill" style="width:60%"></div></div>
+        <span class="pmc-row-value"><b>145</b><span class="unit">µg/m³</span></span>
+      </div>
+      <div class="pmc-row" style="--row-color:#ff7e00">
+        <span class="pmc-row-label">PM2.5</span>
+        <div class="pmc-row-bar"><div class="pmc-row-bar-fill" style="width:40%"></div></div>
+        <span class="pmc-row-value"><b>55.3</b><span class="unit">µg/m³</span></span>
+      </div>
+      <div class="pmc-row" style="--row-color:#ffff00">
+        <span class="pmc-row-label">PM10</span>
+        <div class="pmc-row-bar"><div class="pmc-row-bar-fill" style="width:20%"></div></div>
+        <span class="pmc-row-value"><b>88</b><span class="unit">µg/m³</span></span>
+      </div>
+    </div>
+    <div class="pmc-footer">Good: NO₂ · SO₂ · CO — details ▾</div>
+  </div>
+
+  <!-- ══ Pollen ══ -->
+  <div class="pmc-panel">
+    <span class="pmc-panel-title">Pollen</span>
+    <div class="pmc-hero" style="--row-color:#ff7600">
+      <span class="pmc-hero-value" style="font-size:22px">High</span>
+      <span class="pmc-hero-category"><span class="pmc-swatch"></span>Tree pollen dominant</span>
+      <span class="pmc-hero-meta">peaks Thursday</span>
+    </div>
+    <div class="pmc-rows">
+      <div class="pmc-row" style="--row-color:#ff7600">
+        <span class="pmc-row-label">Tree</span>
+        <div class="pmc-row-bar"><div class="pmc-row-bar-fill" style="width:80%"></div></div>
+        <span class="pmc-row-value"><b>4</b><span class="unit">High</span></span>
+      </div>
+      <div class="pmc-row" style="--row-color:#ffba00">
+        <span class="pmc-row-label">Grass</span>
+        <div class="pmc-row-bar"><div class="pmc-row-bar-fill" style="width:60%"></div></div>
+        <span class="pmc-row-value"><b>3</b><span class="unit">Moderate</span></span>
+      </div>
+      <button class="pmc-row" style="--row-color:#ff7600" aria-expanded="true">
+        <span class="pmc-row-label" style="padding-left:12px">Birch ▾</span>
+        <div class="pmc-row-bar"><div class="pmc-row-bar-fill" style="width:80%"></div></div>
+        <span class="pmc-row-value"><b>4</b><span class="unit">High</span></span>
+      </button>
+      <div class="pmc-detail">
+        <dl>
+          <dt>Family</dt><dd>Betulaceae (the Birch family)</dd>
+          <dt>Season</dt><dd>Late winter, spring</dd>
+          <dt>Cross-reaction</dt><dd>Alder, hazel, hornbeam, beech and oak pollen</dd>
+        </dl>
+      </div>
+      <button class="pmc-row" style="--row-color:#ffba00">
+        <span class="pmc-row-label" style="padding-left:12px">Oak ▸</span>
+        <div class="pmc-row-bar"><div class="pmc-row-bar-fill" style="width:60%"></div></div>
+        <span class="pmc-row-value"><b>3</b><span class="unit">Moderate</span></span>
+      </button>
+    </div>
+    <div class="pmc-footer">Low or quiet: Weed · Elm · Ragweed</div>
+  </div>
+</template>
+
+<script>
+  // Mock data plumbing only — the card computes all of this from entity
+  // attributes (severity / severity_max / color_hex) at runtime.
+  const temps = [76,75,74,74,73,73,74,77,80,83,85,87,88,88,87,85,83,81,80,79,78,78,77,76];
+  const tMin = 73, tMax = 88;
+  const points = temps.map((t, i) =>
+    `${(i / (temps.length - 1)) * 400},${74 - ((t - tMin) / (tMax - tMin)) * 62}`).join(" ");
+
+  // UAQI band colors per hour (Moderate afternoon -> Low storm hours -> Good overnight)
+  const aq = ["#ffff00","#ffff00","#ff8c00","#ff8c00","#ff8c00","#ff8c00","#ffff00","#ffff00",
+              "#ffff00","#84cf33","#84cf33","#84cf33","#84cf33","#84cf33","#009e3a","#009e3a",
+              "#009e3a","#009e3a","#84cf33","#84cf33","#84cf33","#ffff00","#ffff00","#ffff00"];
+  // Precip probability as alpha on one hue
+  const precip = [15,25,55,80,90,90,85,70,55,40,30,20,15,10,10,5,5,5,10,10,15,15,20,20];
+
+  // Nowcast intensities per 10-min bucket (0 none, 1 light, 2 moderate, 3 heavy)
+  const nowcast = [0,0,0,0,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,2,2,2,2,2,1,1,1,1,1,0,0,0,0,0];
+  const intensityColor = ["", "#6ab7ff", "#1e88e5", "#0d47a1"];
+  const intensityHeight = ["6%", "35%", "65%", "100%"];
+
+  for (const host of [document.getElementById("card-light"), document.getElementById("card-dark")]) {
+    host.append(document.getElementById("card-template").content.cloneNode(true));
+    host.querySelector("#temppoly").setAttribute("points", points);
+    const aqBand = host.querySelector("#aqband");
+    for (const c of aq) {
+      const cell = document.createElement("div");
+      cell.className = "pmc-band";
+      cell.style.setProperty("--row-color", c);
+      aqBand.append(cell);
+    }
+    const pBand = host.querySelector("#precipband");
+    for (const p of precip) {
+      const cell = document.createElement("div");
+      cell.className = "pmc-band";
+      cell.style.setProperty("--row-color", `color-mix(in srgb, #1e88e5 ${p}%, transparent)`);
+      pBand.append(cell);
+    }
+    const strip = host.querySelector("#nowcast");
+    for (const level of nowcast) {
+      const bar = document.createElement("div");
+      bar.className = "bar";
+      bar.style.height = intensityHeight[level];
+      bar.style.setProperty("--row-color",
+        level ? intensityColor[level] : "color-mix(in srgb, #1e88e5 15%, transparent)");
+      strip.append(bar);
+    }
+  }
+</script>

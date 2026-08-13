@@ -1,0 +1,322 @@
+/*
+ * Particle Man Card — shared redesign components.
+ * Everything here is written to port ~verbatim into weather-forecast-card.css
+ * (the card renders in light DOM, so these are plain global classes).
+ *
+ * Severity/color inputs arrive per element as --row-color (an entity
+ * color_hex) and per bar as a width percentage (severity / severity_max,
+ * computed from integration attributes). No thresholds live in CSS or TS.
+ */
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--pmc-font);
+  background: var(--primary-background-color);
+  color: var(--primary-text-color);
+}
+
+.ha-card {
+  width: 440px;
+  background: var(--card-background-color);
+  border-radius: var(--ha-card-border-radius);
+  padding: var(--pmc-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pmc-panel-gap);
+}
+
+/* --- Panel chrome --------------------------------------------------------- */
+
+.pmc-panel { display: flex; flex-direction: column; gap: var(--pmc-space-2); }
+
+.pmc-panel-title {
+  font-size: var(--pmc-font-title);
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: var(--pmc-title-tracking);
+  color: var(--secondary-text-color);
+}
+
+.pmc-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--pmc-space-2);
+}
+
+/* Hero: big numeral + category word + swatch, one baseline-aligned row. */
+.pmc-hero {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pmc-space-2);
+}
+
+.pmc-hero-value {
+  font-size: var(--pmc-font-hero);
+  font-weight: var(--pmc-font-hero-weight);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pmc-hero-category {
+  font-size: var(--pmc-font-headline);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pmc-hero-meta {
+  margin-left: auto;
+  font-size: var(--pmc-font-meta);
+  color: var(--secondary-text-color);
+  text-align: right;
+}
+
+.pmc-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--row-color, var(--disabled-color));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-text-color) 18%, transparent);
+  flex-shrink: 0;
+}
+
+/* --- Segmented scale bar (hero severity) ----------------------------------
+ * N segments = severity_max + 1; segments 0..severity get the category color.
+ */
+.pmc-scale {
+  display: flex;
+  gap: var(--pmc-segment-gap);
+  height: var(--pmc-segment-height);
+}
+
+.pmc-scale-seg {
+  flex: 1;
+  border-radius: var(--pmc-segment-radius);
+  background: color-mix(in srgb, var(--row-color, var(--disabled-color)) var(--pmc-bar-track-mix), transparent);
+}
+
+.pmc-scale-seg.on { background: var(--row-color, var(--disabled-color)); }
+
+/* --- Bar rows: label | bar | value ---------------------------------------- */
+
+.pmc-rows { display: flex; flex-direction: column; }
+
+.pmc-row {
+  display: grid;
+  grid-template-columns: var(--pmc-label-col) 1fr var(--pmc-value-col);
+  align-items: center;
+  column-gap: var(--pmc-row-gap);
+  min-height: var(--pmc-row-stride);
+  font-size: var(--pmc-font-row);
+}
+
+button.pmc-row {
+  border: none; background: none; padding: 0; color: inherit;
+  font: inherit; text-align: left; cursor: pointer; width: 100%;
+}
+
+.pmc-row-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pmc-row-bar {
+  height: var(--pmc-bar-height);
+  border-radius: var(--pmc-bar-radius);
+  background: color-mix(in srgb, var(--row-color, var(--disabled-color)) var(--pmc-bar-track-mix), transparent);
+  overflow: hidden;
+}
+
+.pmc-row-bar-fill {
+  height: 100%;
+  border-radius: var(--pmc-bar-radius);
+  background: var(--row-color, var(--disabled-color));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-text-color) 12%, transparent);
+  min-width: var(--pmc-bar-height); /* severity 0 still shows a dot-width nub */
+}
+
+.pmc-row-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pmc-row-value b { font-weight: 600; }
+
+.pmc-row-value .unit {
+  color: var(--secondary-text-color);
+  font-size: var(--pmc-font-meta);
+  margin-left: 2px;
+}
+
+.pmc-chip {
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--secondary-text-color);
+  border: 1px solid var(--divider-color);
+  border-radius: 4px;
+  padding: 1px 4px;
+  flex-shrink: 0;
+}
+
+/* Quiet-row footer: what was hidden, so absence reads as checked-and-fine. */
+.pmc-footer {
+  font-size: var(--pmc-font-meta);
+  color: var(--secondary-text-color);
+}
+
+/* Expandable detail (plants, health text, alert bodies) */
+.pmc-detail {
+  font-size: var(--pmc-font-row);
+  color: var(--secondary-text-color);
+  display: flex;
+  gap: var(--pmc-space-3);
+  padding: var(--pmc-space-1) 0 var(--pmc-space-2);
+}
+
+.pmc-detail img {
+  width: 64px; height: 64px; object-fit: cover;
+  border-radius: 8px; flex-shrink: 0;
+}
+
+.pmc-detail dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px var(--pmc-space-2);
+}
+
+.pmc-detail dt { color: var(--secondary-text-color); }
+.pmc-detail dd { margin: 0; color: var(--primary-text-color); }
+
+/* --- Alerts ---------------------------------------------------------------- */
+
+.pmc-alerts {
+  border-radius: 12px;
+  border: 1px solid var(--row-color, var(--info-color));
+  background: color-mix(in srgb, var(--row-color, var(--info-color)) 10%, transparent);
+  overflow: hidden;
+}
+
+.pmc-alerts-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--pmc-space-2);
+  padding: var(--pmc-space-2) var(--pmc-space-3);
+  font-size: var(--pmc-font-row);
+  font-weight: 550;
+}
+
+.pmc-alerts-banner .pmc-chip {
+  color: var(--primary-text-color);
+  border-color: color-mix(in srgb, var(--row-color) 60%, var(--divider-color));
+  background: color-mix(in srgb, var(--row-color) 25%, transparent);
+}
+
+.pmc-alerts-body {
+  padding: 0 var(--pmc-space-3) var(--pmc-space-2);
+  font-size: var(--pmc-font-meta);
+  color: var(--secondary-text-color);
+}
+
+/* --- Band strip (nowcast bars, forecast severity bands) -------------------- */
+
+.pmc-bands {
+  display: flex;
+  gap: var(--pmc-band-gap);
+  height: var(--pmc-band-height);
+  border-radius: var(--pmc-band-radius);
+  overflow: hidden;
+}
+
+.pmc-band { flex: 1; background: var(--row-color, transparent); }
+
+.pmc-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--pmc-font-meta);
+  color: var(--secondary-text-color);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Nowcast intensity bars grow upward from a common baseline. */
+.pmc-nowcast-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 44px;
+}
+
+.pmc-nowcast-bars .bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  background: var(--row-color, var(--disabled-color));
+  min-height: 2px;
+}
+
+/* Strip label row: "Rain starting in 42 min" + meta on the right. */
+.pmc-strip-callout {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--pmc-space-2);
+  font-size: var(--pmc-font-row);
+  font-weight: 550;
+}
+
+.pmc-strip-callout .meta {
+  font-size: var(--pmc-font-meta);
+  font-weight: 400;
+  color: var(--secondary-text-color);
+}
+
+/* --- Current conditions hero ----------------------------------------------- */
+
+.pmc-current {
+  display: flex;
+  align-items: center;
+  gap: var(--pmc-space-3);
+}
+
+.pmc-current-temp {
+  font-size: 44px;
+  font-weight: 300;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pmc-current-cond { display: flex; flex-direction: column; gap: 2px; }
+.pmc-current-cond .state { font-size: var(--pmc-font-headline); font-weight: 550; }
+.pmc-current-cond .meta { font-size: var(--pmc-font-meta); color: var(--secondary-text-color); }
+
+.pmc-current-attrs {
+  margin-left: auto;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 3px 12px;
+  font-size: var(--pmc-font-meta);
+  color: var(--secondary-text-color);
+  text-align: right;
+}
+
+.pmc-current-attrs b {
+  color: var(--primary-text-color);
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Mockup page scaffolding (NOT ported) ---------------------------------- */
+
+.mock-pair { display: flex; gap: 24px; padding: 24px; flex-wrap: wrap; }
+.mock-col { display: flex; flex-direction: column; gap: 8px; }
+.mock-col > .tag { font: 650 11px/1 var(--pmc-font); letter-spacing: .08em; text-transform: uppercase; color: var(--secondary-text-color); }
