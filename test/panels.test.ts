@@ -300,9 +300,9 @@ describe("wfc-air-quality", () => {
     await el.updateComplete;
 
     expect(el.querySelector(".pmc-hero-value")?.textContent).toContain("65");
-    // UAQI severity 1 of 4 → 5 segments, 2 lit.
-    expect(el.querySelectorAll(".pmc-scale-seg")).toHaveLength(5);
-    expect(el.querySelectorAll(".pmc-scale-seg.on")).toHaveLength(2);
+    // The UAQI segmented scale was removed by review — category text only.
+    expect(el.querySelectorAll(".pmc-scale-seg")).toHaveLength(0);
+    expect(el.textContent).toContain("Good air quality");
     // Only the elevated PM2.5 gets a bar; Good ozone is quiet.
     const rows = el.querySelectorAll(".pmc-row");
     expect(rows).toHaveLength(1);

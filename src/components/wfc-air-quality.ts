@@ -13,7 +13,7 @@ import {
   severityOf,
   shortNameOf,
 } from "../data/panel-entities";
-import { barRow, scaleBar } from "./bar";
+import { barRow } from "./bar";
 import { localize } from "../localize/localize";
 
 /**
@@ -120,7 +120,6 @@ export class WfcAirQuality extends LitElement {
         </span>
         <span class="pmc-hero-meta">${meta}</span>
       </div>
-      ${scaleBar(severityOf(aqi), severityMaxOf(aqi), color)}
     `;
   }
 
