@@ -39,6 +39,7 @@ describe("weather-forecast-card chart", () => {
       {
         type: "custom:particle-man-card",
         entity: "weather.demo",
+      forecast_action: { tap_action: { action: "toggle-forecast" } },
         forecast: {
           mode: ForecastMode.Chart,
           show_sun_times: false,
@@ -110,7 +111,7 @@ describe("weather-forecast-card chart", () => {
 
   it("should render chart container and canvas", async () => {
     const chartContainer = card.shadowRoot!.querySelector(
-      ".wfc-forecast-chart"
+      ".pmc-forecast-chart"
     );
     expect(chartContainer).not.toBeNull();
 
@@ -133,7 +134,7 @@ describe("weather-forecast-card chart", () => {
       );
 
       const iconProvider = item.querySelector(
-        "wfc-weather-condition-icon-provider"
+        "pmc-weather-condition-icon-provider"
       );
       expect(iconProvider).not.toBeNull();
       const iconDiv = iconProvider!.querySelector(
@@ -155,7 +156,7 @@ describe("weather-forecast-card chart", () => {
   });
 
   it("should toggle to hourly on tap and render hourly forecast items", async () => {
-    const chartElement = card.shadowRoot!.querySelector("wfc-forecast-chart");
+    const chartElement = card.shadowRoot!.querySelector("pmc-forecast-chart");
     expect(chartElement).not.toBeNull();
 
     // Dispatch action event directly (actionHandler directive doesn't work in test env)
@@ -189,7 +190,7 @@ describe("weather-forecast-card chart", () => {
       );
 
       const iconProvider = item.querySelector(
-        "wfc-weather-condition-icon-provider"
+        "pmc-weather-condition-icon-provider"
       );
       expect(iconProvider).not.toBeNull();
       const iconDiv = iconProvider!.querySelector(
@@ -204,12 +205,12 @@ describe("weather-forecast-card chart", () => {
 
   it("should render chart with correct data", async () => {
     const chartContainer = card.shadowRoot!.querySelector(
-      ".wfc-forecast-chart"
+      ".pmc-forecast-chart"
     );
     expect(chartContainer).not.toBeNull();
 
     const chartElement = card.shadowRoot!.querySelector(
-      "wfc-forecast-chart"
+      "pmc-forecast-chart"
     ) as WfcForecastChart;
     expect(chartElement).not.toBeNull();
 
@@ -294,7 +295,7 @@ describe("weather-forecast-card chart", () => {
   });
 
   it("should support drag-to-scroll when dragging", async () => {
-    const chartComponent = card.shadowRoot!.querySelector("wfc-forecast-chart");
+    const chartComponent = card.shadowRoot!.querySelector("pmc-forecast-chart");
     expect(chartComponent).not.toBeNull();
 
     const scrollContainer = chartComponent!.querySelector(
@@ -556,7 +557,7 @@ describe("weather-forecast-card chart", () => {
     `);
 
     const chartElement = card.shadowRoot!.querySelector(
-      "wfc-forecast-chart"
+      "pmc-forecast-chart"
     ) as WfcForecastChart;
     chartElement.forecast = largeForecast;
     chartElement.itemWidth = 50;
@@ -602,7 +603,7 @@ describe("weather-forecast-card chart", () => {
         forecast: { mode: ForecastMode.Chart, show_attribute_selector: false },
       });
 
-      const chartElement = card.shadowRoot!.querySelector("wfc-forecast-chart");
+      const chartElement = card.shadowRoot!.querySelector("pmc-forecast-chart");
       expect(chartElement).not.toBeNull();
 
       const settingsButton = chartElement!.querySelector(
@@ -616,7 +617,7 @@ describe("weather-forecast-card chart", () => {
         forecast: { mode: ForecastMode.Chart },
       });
 
-      const chartElement = card.shadowRoot!.querySelector("wfc-forecast-chart");
+      const chartElement = card.shadowRoot!.querySelector("pmc-forecast-chart");
       expect(chartElement).not.toBeNull();
 
       const settingsButton = chartElement!.querySelector(
@@ -630,7 +631,7 @@ describe("weather-forecast-card chart", () => {
         forecast: { mode: ForecastMode.Chart, show_attribute_selector: true },
       });
 
-      const chartElement = card.shadowRoot!.querySelector("wfc-forecast-chart");
+      const chartElement = card.shadowRoot!.querySelector("pmc-forecast-chart");
       expect(chartElement).not.toBeNull();
 
       const settingsButton = chartElement!.querySelector(
@@ -645,7 +646,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
       expect(chartElement).not.toBeNull();
 
@@ -656,7 +657,7 @@ describe("weather-forecast-card chart", () => {
 
       // Initially dropdown should not be visible
       let dropdown = chartElement!.querySelector(
-        "wfc-chart-attribute-selector"
+        "pmc-chart-attribute-selector"
       );
       expect(dropdown).not.toBeNull();
       // @ts-expect-error: open is a property
@@ -666,7 +667,7 @@ describe("weather-forecast-card chart", () => {
       settingsButton.click();
       await chartElement.updateComplete;
 
-      dropdown = chartElement!.querySelector("wfc-chart-attribute-selector");
+      dropdown = chartElement!.querySelector("pmc-chart-attribute-selector");
       // @ts-expect-error: open is a property
       expect(dropdown!.open).toBe(true);
     });
@@ -677,7 +678,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       // Set forecast with humidity data
@@ -686,7 +687,7 @@ describe("weather-forecast-card chart", () => {
 
       // Simulate attribute selection
       const dropdown = chartElement.querySelector(
-        "wfc-chart-attribute-selector"
+        "pmc-chart-attribute-selector"
       );
       expect(dropdown).not.toBeNull();
 
@@ -716,14 +717,14 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
       await chartElement.updateComplete;
 
       const dropdown = chartElement.querySelector(
-        "wfc-chart-attribute-selector"
+        "pmc-chart-attribute-selector"
       );
       dropdown!.dispatchEvent(
         new CustomEvent("selected", { detail: { value: "pressure" } })
@@ -747,14 +748,14 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
       await chartElement.updateComplete;
 
       const dropdown = chartElement.querySelector(
-        "wfc-chart-attribute-selector"
+        "pmc-chart-attribute-selector"
       );
       dropdown!.dispatchEvent(
         new CustomEvent("selected", { detail: { value: "uv_index" } })
@@ -781,14 +782,14 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
       await chartElement.updateComplete;
 
       const dropdown = chartElement.querySelector(
-        "wfc-chart-attribute-selector"
+        "pmc-chart-attribute-selector"
       );
       dropdown!.dispatchEvent(
         new CustomEvent("selected", {
@@ -814,14 +815,14 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
       await chartElement.updateComplete;
 
       const dropdown = chartElement.querySelector(
-        "wfc-chart-attribute-selector"
+        "pmc-chart-attribute-selector"
       );
 
       // First switch to humidity
@@ -854,7 +855,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       // Set forecast without uv_index data
@@ -885,7 +886,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       const settingsButton = chartElement!.querySelector(
@@ -897,7 +898,7 @@ describe("weather-forecast-card chart", () => {
       await chartElement.updateComplete;
 
       const dropdown = chartElement!.querySelector(
-        "wfc-chart-attribute-selector"
+        "pmc-chart-attribute-selector"
       );
       // @ts-expect-error: open is a property
       expect(dropdown!.open).toBe(true);
@@ -920,7 +921,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
@@ -942,7 +943,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
@@ -964,7 +965,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
@@ -983,7 +984,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
@@ -1009,7 +1010,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
@@ -1038,7 +1039,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
@@ -1063,7 +1064,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
@@ -1077,7 +1078,7 @@ describe("weather-forecast-card chart", () => {
 
       // Switch to temperature_and_precipitation
       const dropdown = chartElement.querySelector(
-        "wfc-chart-attribute-selector"
+        "pmc-chart-attribute-selector"
       );
       dropdown!.dispatchEvent(
         new CustomEvent("selected", {
@@ -1104,7 +1105,7 @@ describe("weather-forecast-card chart", () => {
       });
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       chartElement.forecast = forecastWithAllAttributes;
@@ -1118,7 +1119,7 @@ describe("weather-forecast-card chart", () => {
 
       // Switch to uv_index
       const dropdown = chartElement.querySelector(
-        "wfc-chart-attribute-selector"
+        "pmc-chart-attribute-selector"
       );
       dropdown!.dispatchEvent(
         new CustomEvent("selected", {
@@ -1141,7 +1142,7 @@ describe("weather-forecast-card chart", () => {
       const { card } = await createCardFixture();
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       // @ts-expect-error: _getChartFontSize is private
@@ -1156,7 +1157,7 @@ describe("weather-forecast-card chart", () => {
       );
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       // @ts-expect-error: _getChartFontSize is private
@@ -1171,7 +1172,7 @@ describe("weather-forecast-card chart", () => {
       );
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       // @ts-expect-error: _getChartFontSize is private
@@ -1229,7 +1230,7 @@ describe("weather-forecast-card chart", () => {
       );
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       // @ts-expect-error: _getBarLabelOffset is private
@@ -1242,7 +1243,7 @@ describe("weather-forecast-card chart", () => {
       const { card } = await createCardFixture();
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       // @ts-expect-error: _getBarLabelOffset is private
@@ -1265,10 +1266,10 @@ describe("weather-forecast-card chart", () => {
       // Test with default font size (12)
       const { card: defaultCard } = await createCardFixture();
       const defaultChartElement = defaultCard.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
       const defaultContainer = defaultChartElement.querySelector(
-        ".wfc-forecast-chart"
+        ".pmc-forecast-chart"
       ) as HTMLElement;
       const defaultHeight = parseInt(defaultContainer.style.height);
 
@@ -1278,11 +1279,11 @@ describe("weather-forecast-card chart", () => {
         { "--wfc-chart-font-size": "16" }
       );
       const largerChartElement = largerCard.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       const largerContainer = largerChartElement.querySelector(
-        ".wfc-forecast-chart"
+        ".pmc-forecast-chart"
       ) as HTMLElement;
       const largerHeight = parseInt(largerContainer.style.height);
 
@@ -1295,11 +1296,11 @@ describe("weather-forecast-card chart", () => {
       const { card } = await createCardFixture();
 
       const chartElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart"
+        "pmc-forecast-chart"
       ) as WfcForecastChart;
 
       const chartContainer = chartElement.querySelector(
-        ".wfc-forecast-chart"
+        ".pmc-forecast-chart"
       ) as HTMLElement;
 
       expect(chartContainer.style.height).toBe("130px");

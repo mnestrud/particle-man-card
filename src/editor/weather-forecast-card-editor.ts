@@ -594,10 +594,6 @@ export class WeatherForecastCardEditor
                     label: "Hourly and daily",
                   },
                   {
-                    value: "all",
-                    label: "Hourly, daily and twice-daily",
-                  },
-                  {
                     value: "daily",
                     label: "Daily only",
                   },

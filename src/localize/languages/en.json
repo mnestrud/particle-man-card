@@ -32,7 +32,9 @@
     "aqi": "AQI",
     "dominant": "Main pollutant",
     "health": "Health recommendations",
-    "pollutants": "Pollutants"
+    "pollutants": "Pollutants",
+    "universal_aqi": "Universal AQI",
+    "dominant_chip": "dominant"
   },
   "pollen": {
     "title": "Pollen",
@@ -44,10 +46,18 @@
     "genus": "Genus",
     "season": "Season",
     "cross_reaction": "Cross-reactions",
-    "no_data": "No pollen data"
+    "no_data": "No pollen data",
+    "dominant_line": "{type} pollen dominant"
   },
   "panel": {
     "no_entities": "No matching sensors found",
-    "discovering": "Finding sensors…"
+    "discovering": "Finding sensors…",
+    "quiet": "Quiet",
+    "all_quiet": "all quiet"
+  },
+  "forecast": {
+    "title": "Forecast",
+    "hourly": "Hourly",
+    "daily": "Daily"
   }
 }

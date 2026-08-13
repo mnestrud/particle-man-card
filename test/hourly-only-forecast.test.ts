@@ -79,7 +79,7 @@ describe("hourly-only forecast", () => {
       expect(forecastContainer).not.toBeNull();
 
       const forecastItems = forecastContainer?.querySelectorAll(
-        "wfc-forecast-simple"
+        "pmc-forecast-simple"
       );
       expect(forecastItems).not.toBeNull();
       expect(forecastItems?.length).toBeGreaterThan(0);
@@ -258,7 +258,7 @@ describe("hourly-only forecast", () => {
 
     it("should render chart container", async () => {
       const chartContainer =
-        card.shadowRoot?.querySelector("wfc-forecast-chart");
+        card.shadowRoot?.querySelector("pmc-forecast-chart");
       expect(chartContainer).not.toBeNull();
     });
 
@@ -286,7 +286,7 @@ describe("hourly-only forecast", () => {
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const chartComponent =
-        card.shadowRoot?.querySelector("wfc-forecast-chart");
+        card.shadowRoot?.querySelector("pmc-forecast-chart");
       expect(chartComponent).not.toBeNull();
 
       // The chart should have rendered canvas

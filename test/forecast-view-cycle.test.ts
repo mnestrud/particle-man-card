@@ -5,9 +5,11 @@ import { WeatherEntityFeature } from "../src/data/weather";
 import "../src/index";
 
 /**
- * Deterministic tests for the three-view forecast cycle. The subscription
- * flow is timing-dependent in happy-dom, so these drive the state machine
- * directly: seed the per-view data slots and assert on the transitions.
+ * Deterministic tests for the two-view forecast cycle (the twice-daily third
+ * view was removed with the redesign; "all" remains a legacy config alias for
+ * "both"). The subscription flow is timing-dependent in happy-dom, so these
+ * drive the state machine directly: seed the per-view data slots and assert
+ * on the transitions.
  */
 
 const FEATURES_ALL =
@@ -20,7 +22,6 @@ const makeCard = (
   slots: {
     daily?: number;
     hourly?: number;
-    twiceDaily?: number;
   }
 ): WeatherForecastCard => {
   const card = document.createElement(
@@ -49,9 +50,6 @@ const makeCard = (
   if (slots.hourly) {
     (card as any)._hourlyForecastData = Array(slots.hourly).fill(entry);
   }
-  if (slots.twiceDaily) {
-    (card as any)._twiceDailyForecastData = Array(slots.twiceDaily).fill(entry);
-  }
   /* eslint-enable @typescript-eslint/no-explicit-any */
   return card;
 };
@@ -69,18 +67,12 @@ const currentForecast = (card: WeatherForecastCard): unknown[] =>
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 describe("forecast view cycle", () => {
-  it("cycles daily -> hourly -> twice_daily -> daily with all three views", () => {
-    const card = makeCard(FEATURES_ALL, {
-      daily: 5,
-      hourly: 24,
-      twiceDaily: 10,
-    });
+  it("cycles daily -> hourly -> daily (legacy forecast_types: all config)", () => {
+    const card = makeCard(FEATURES_ALL, { daily: 5, hourly: 24 });
     expect(viewOf(card)).toBe("daily");
 
     toggle(card);
     expect(viewOf(card)).toBe("hourly");
-    toggle(card);
-    expect(viewOf(card)).toBe("twice_daily");
     toggle(card);
     expect(viewOf(card)).toBe("daily");
   });
@@ -95,28 +87,17 @@ describe("forecast view cycle", () => {
   });
 
   it("skips views that have no data", () => {
-    const card = makeCard(FEATURES_ALL, { daily: 5, twiceDaily: 10 });
+    const card = makeCard(FEATURES_ALL, { hourly: 24 });
 
+    setView(card, "hourly");
     toggle(card);
-    expect(viewOf(card)).toBe("twice_daily"); // hourly slot empty, skipped
-    toggle(card);
-    expect(viewOf(card)).toBe("daily");
+    expect(viewOf(card)).toBe("hourly"); // daily slot empty, nothing to cycle
   });
 
   it("does not toggle at all with a single populated view", () => {
     const card = makeCard(FEATURES_ALL, { daily: 5 });
     toggle(card);
     expect(viewOf(card)).toBe("daily");
-  });
-
-  it("serves the separate twice_daily slot in the third view", () => {
-    const card = makeCard(FEATURES_ALL, {
-      daily: 5,
-      hourly: 24,
-      twiceDaily: 10,
-    });
-    setView(card, "twice_daily");
-    expect(currentForecast(card)).toHaveLength(10);
   });
 
   it("falls back to the daily slot for twice_daily-only entities", () => {

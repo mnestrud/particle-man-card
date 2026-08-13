@@ -8,7 +8,7 @@ import { ForecastAttribute, WeatherEntity } from "../src/data/weather";
 
 import "../src/components/wfc-wind-indicator";
 
-describe("wfc-wind-indicator", () => {
+describe("pmc-wind-indicator", () => {
   describe("rendering", () => {
     it("should render nothing when hass is not provided", async () => {
       const mockHass = new MockHass();
@@ -20,11 +20,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${null}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -37,11 +37,11 @@ describe("wfc-wind-indicator", () => {
       const weatherEntity = hass.states["weather.demo"];
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${null}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -57,11 +57,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${null}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -122,11 +122,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -145,11 +145,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -166,11 +166,11 @@ describe("wfc-wind-indicator", () => {
       const forecast: ForecastAttribute = {} as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -366,11 +366,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -389,11 +389,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -412,11 +412,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -435,11 +435,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -458,11 +458,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -481,11 +481,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -504,11 +504,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -527,11 +527,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -550,11 +550,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -573,11 +573,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -596,11 +596,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -619,11 +619,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -644,11 +644,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -669,11 +669,11 @@ describe("wfc-wind-indicator", () => {
       } as ForecastAttribute;
 
       const element = await fixture<WfcWindIndicator>(
-        html`<wfc-wind-indicator
+        html`<pmc-wind-indicator
           .hass=${hass}
           .weatherEntity=${weatherEntity}
           .forecast=${forecast}
-        ></wfc-wind-indicator>`
+        ></pmc-wind-indicator>`
       );
       await element.updateComplete;
 
@@ -755,12 +755,12 @@ const createFixture = async (options: CreateFixtureOptions) => {
     } as ForecastAttribute);
 
   const element = await fixture<WfcWindIndicator>(
-    html`<wfc-wind-indicator
+    html`<pmc-wind-indicator
       .hass=${hass}
       .weatherEntity=${weatherEntity}
       .forecast=${forecast}
       .type=${options.type ?? "bearing"}
-    ></wfc-wind-indicator>`
+    ></pmc-wind-indicator>`
   );
 
   // Only override defaults if explicitly provided

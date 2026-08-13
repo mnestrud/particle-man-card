@@ -8,21 +8,23 @@ import {
   categoryOf,
   classifyPollen,
   colorOf,
-  friendlyNameOf,
+  isQuiet,
+  severityMaxOf,
+  severityOf,
+  shortNameOf,
 } from "../data/panel-entities";
+import { barRow, barWidth } from "./bar";
 import { localize } from "../localize/localize";
 
 /**
- * Pollen panel: advisory header, tree/grass/weed tiles, and an in-season
- * plant grid with expandable botanical detail.
+ * Pollen panel, dense-bar design language (see design/full-card-*.html):
+ * advisory hero, one severity bar per type/plant above its action level,
+ * expandable botanical detail per plant, quiet rows collapsed into a footer.
  *
- * All category colors come from the integration's `color_hex` attribute —
- * Google's own UPI palette — so there is no threshold logic here. The hexes
- * are fixed brand colors that don't adapt to theme, so they are used only as
- * swatches and chips, never as text or backgrounds that must meet contrast.
- *
- * Out-of-season plants read `unknown` most of the year; showing them would
- * render a mostly-empty grid, so only in-season plants appear.
+ * All colors are integration `color_hex`, bar lengths severity/severity_max —
+ * no thresholds or vocabulary live here. Out-of-season plants stay hidden
+ * (in-season filtering lives in classifyPollen); in-season-but-quiet rows go
+ * to the footer so a Very Low day collapses to a single advisory line.
  */
 @customElement("wfc-pollen")
 export class WfcPollen extends LitElement {
@@ -30,6 +32,7 @@ export class WfcPollen extends LitElement {
   @property({ attribute: false }) public discovery?: DiscoveryResult;
 
   @state() private expandedPlant: string | null = null;
+  @state() private showQuiet = false;
 
   protected createRenderRoot(): HTMLElement | DocumentFragment {
     return this;
@@ -40,8 +43,8 @@ export class WfcPollen extends LitElement {
       return nothing;
     }
     if (!this.discovery) {
-      return html`<div class="wfc-panel wfc-pollen">
-        <div class="wfc-panel-empty">
+      return html`<div class="pmc-panel">
+        <div class="pmc-panel-empty">
           ${localize(this.hass, "panel.discovering")}
         </div>
       </div>`;
@@ -51,56 +54,98 @@ export class WfcPollen extends LitElement {
       this.discovery.entities
     );
     if (!advisory && types.length === 0) {
-      return html`<div class="wfc-panel wfc-pollen">
-        <div class="wfc-panel-empty">
+      return html`<div class="pmc-panel">
+        <div class="pmc-panel-empty">
           ${localize(this.hass, "panel.no_entities")}
         </div>
       </div>`;
     }
 
+    const bySeverity = (a: ClassifiedEntity, b: ClassifiedEntity) =>
+      (severityOf(b) ?? -1) - (severityOf(a) ?? -1);
+    const activeTypes = types.filter((t) => !isQuiet(t)).sort(bySeverity);
+    const activePlants = plants.filter((p) => !isQuiet(p)).sort(bySeverity);
+    const quiet = [
+      ...types.filter((t) => isQuiet(t)).sort(bySeverity),
+      ...plants.filter((p) => isQuiet(p)).sort(bySeverity),
+    ];
+
     return html`
-      <div class="wfc-panel wfc-pollen">
-        <div class="wfc-panel-header">
-          <span class="wfc-panel-title">
-            ${localize(this.hass, "pollen.title")}
-          </span>
-          ${advisory
-            ? html`<span class="wfc-panel-headline">
-                ${advisory.state.state}
-              </span>`
-            : nothing}
-        </div>
-        ${types.length
-          ? html`<div class="wfc-pollen-types">
-              ${types.map((type) => this.renderTile(type))}
+      <div class="pmc-panel pmc-pollen">
+        <span class="pmc-panel-title">
+          ${localize(this.hass, "pollen.title")}
+        </span>
+        ${advisory ? this.renderHero(advisory, quiet.length > 0) : nothing}
+        ${activeTypes.length ||
+        activePlants.length ||
+        (this.showQuiet && quiet.length)
+          ? html`<div class="pmc-rows">
+              ${activeTypes.map((type) => this.renderType(type))}
+              ${activePlants.map((plant) => this.renderPlant(plant))}
+              ${this.showQuiet
+                ? quiet.map((entity) => this.renderType(entity))
+                : nothing}
             </div>`
           : nothing}
-        ${plants.length
-          ? html`<div class="wfc-pollen-plants">
-              ${plants.map((plant) => this.renderPlant(plant))}
-            </div>`
+        ${quiet.length
+          ? html`<button
+              class="pmc-footer"
+              @click=${() => (this.showQuiet = !this.showQuiet)}
+              aria-expanded=${this.showQuiet}
+            >
+              ${localize(this.hass, "panel.quiet")}:
+              ${quiet.map((entity) => this.shortName(entity)).join(" · ")}
+              ${this.showQuiet ? "▴" : "▾"}
+            </button>`
           : nothing}
       </div>
     `;
   }
 
-  private renderTile(entity: ClassifiedEntity): TemplateResult {
-    const color = colorOf(entity);
-    const category = categoryOf(entity);
+  private renderHero(
+    advisory: ClassifiedEntity,
+    allQuiet: boolean
+  ): TemplateResult {
+    const attrs = advisory.state.attributes as Record<string, unknown>;
+    const color = colorOf(advisory);
+    const dominantType =
+      typeof attrs.dominant_type === "string" && attrs.dominant_type
+        ? localize(
+            this.hass,
+            "pollen.dominant_line",
+            "{type}",
+            attrs.dominant_type.charAt(0).toUpperCase() +
+              attrs.dominant_type.slice(1)
+          )
+        : allQuiet
+          ? localize(this.hass, "panel.all_quiet")
+          : "";
     return html`
-      <div class="wfc-pollen-tile">
-        <span
-          class="wfc-swatch"
-          style=${styleMap({ background: color ?? "var(--disabled-color)" })}
-        ></span>
-        <div class="wfc-pollen-tile-body">
-          <span class="wfc-pollen-tile-name">${friendlyNameOf(entity)}</span>
-          <span class="wfc-pollen-tile-value">
-            ${entity.state.state}${category ? html` · ${category}` : nothing}
-          </span>
-        </div>
+      <div
+        class="pmc-hero"
+        style=${styleMap({ "--row-color": color ?? "var(--disabled-color)" })}
+      >
+        <span class="pmc-hero-value text">${advisory.state.state}</span>
+        <span class="pmc-hero-category">
+          <span class="pmc-swatch"></span>${dominantType}
+        </span>
       </div>
     `;
+  }
+
+  private shortName(entity: ClassifiedEntity): string {
+    return shortNameOf(entity, this.discovery?.entities ?? []);
+  }
+
+  private renderType(entity: ClassifiedEntity): TemplateResult {
+    return barRow({
+      label: this.shortName(entity),
+      color: colorOf(entity),
+      severity: severityOf(entity),
+      severityMax: severityMaxOf(entity),
+      value: entity.state.state,
+      unit: categoryOf(entity) ?? "",
+    });
   }
 
   private renderPlant(entity: ClassifiedEntity): TemplateResult {
@@ -113,50 +158,54 @@ export class WfcPollen extends LitElement {
       [localize(this.hass, "pollen.season"), attrs.season],
       [localize(this.hass, "pollen.cross_reaction"), attrs.cross_reaction],
     ];
+    const hasDetail = detailRows.some(
+      ([, value]) => typeof value === "string" && value
+    );
 
     return html`
-      <div class="wfc-pollen-plant">
-        <button
-          class="wfc-pollen-plant-row"
-          @click=${() =>
-            (this.expandedPlant = expanded ? null : entity.entityId)}
-          aria-expanded=${expanded}
-        >
-          <span
-            class="wfc-swatch"
-            style=${styleMap({ background: color ?? "var(--disabled-color)" })}
-          ></span>
-          <span class="wfc-pollen-plant-name">${friendlyNameOf(entity)}</span>
-          <span class="wfc-pollen-plant-value">
-            ${entity.state.state}${categoryOf(entity)
-              ? html` · ${categoryOf(entity)}`
+      <button
+        class="pmc-row"
+        style=${styleMap({ "--row-color": color ?? "var(--disabled-color)" })}
+        @click=${() =>
+          (this.expandedPlant = expanded ? null : entity.entityId)}
+        aria-expanded=${expanded}
+      >
+        <span class="pmc-row-label" style="padding-left:12px">
+          ${this.shortName(entity)} ${hasDetail ? (expanded ? "▴" : "▸") : ""}
+        </span>
+        <div class="pmc-row-bar">
+          <div
+            class="pmc-row-bar-fill"
+            style=${styleMap({
+              width: barWidth(severityOf(entity), severityMaxOf(entity)),
+            })}
+          ></div>
+        </div>
+        <span class="pmc-row-value">
+          <b>${entity.state.state}</b><span class="unit">${categoryOf(entity) ?? ""}</span>
+        </span>
+      </button>
+      ${expanded && hasDetail
+        ? html`<div class="pmc-detail">
+            ${typeof attrs.picture === "string" && attrs.picture
+              ? html`<img
+                  src=${attrs.picture}
+                  alt=${this.shortName(entity)}
+                  @error=${(ev: Event) => (ev.target as HTMLElement).remove()}
+                />`
               : nothing}
-          </span>
-        </button>
-        ${expanded
-          ? html`<div class="wfc-pollen-plant-detail">
-              ${typeof attrs.picture === "string" && attrs.picture
-                ? html`<img
-                    class="wfc-pollen-plant-picture"
-                    src=${attrs.picture}
-                    alt=${friendlyNameOf(entity)}
-                    @error=${(ev: Event) =>
-                      (ev.target as HTMLElement).remove()}
-                  />`
-                : nothing}
-              <dl>
-                ${detailRows
-                  .filter(([, value]) => typeof value === "string" && value)
-                  .map(
-                    ([label, value]) => html`
-                      <dt>${label}</dt>
-                      <dd>${value}</dd>
-                    `
-                  )}
-              </dl>
-            </div>`
-          : nothing}
-      </div>
+            <dl>
+              ${detailRows
+                .filter(([, value]) => typeof value === "string" && value)
+                .map(
+                  ([label, value]) => html`
+                    <dt>${label}</dt>
+                    <dd>${value}</dd>
+                  `
+                )}
+            </dl>
+          </div>`
+        : nothing}
     `;
   }
 }

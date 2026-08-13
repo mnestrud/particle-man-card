@@ -23,6 +23,7 @@ describe("weather-forecast-card simple", () => {
   const testConfig: WeatherForecastCardConfig = {
     type: "custom:particle-man-card",
     entity: "weather.demo",
+    forecast_action: { tap_action: { action: "toggle-forecast" } },
     forecast: {
       mode: ForecastMode.Simple,
       show_sun_times: false,
@@ -116,7 +117,7 @@ describe("weather-forecast-card simple", () => {
   });
 
   it("should toggle to hourly on tap and render hourly forecast", async () => {
-    const simpleElement = card.shadowRoot!.querySelector("wfc-forecast-simple");
+    const simpleElement = card.shadowRoot!.querySelector("pmc-forecast-simple");
     expect(simpleElement).not.toBeNull();
 
     // Dispatch action event directly (actionHandler directive doesn't work in test env)
@@ -163,7 +164,7 @@ describe("weather-forecast-card simple", () => {
 
   it("should support drag-to-scroll when dragging", async () => {
     const simpleComponent = card.shadowRoot!.querySelector(
-      "wfc-forecast-simple"
+      "pmc-forecast-simple"
     );
     expect(simpleComponent).not.toBeNull();
 

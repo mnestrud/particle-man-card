@@ -151,7 +151,9 @@ export class WfcNowcast extends LitElement {
 
     return html`
       <div class="wfc-nowcast">
-        <div class="wfc-nowcast-headline">${this.headline()}</div>
+        <div class="pmc-strip-callout">
+          <span>${this.headline()}</span>
+        </div>
         <div class="wfc-nowcast-chart">
           <canvas></canvas>
         </div>

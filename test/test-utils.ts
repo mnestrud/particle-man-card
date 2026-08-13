@@ -43,7 +43,7 @@ export const createWeatherForecastCardTestFixture = async (
 
   if (config.forecast?.mode === ForecastMode.Chart) {
     const chartElement = card.shadowRoot!.querySelector(
-      "wfc-forecast-chart"
+      "pmc-forecast-chart"
     ) as WfcForecastChart;
 
     expect(chartElement).not.toBeNull();

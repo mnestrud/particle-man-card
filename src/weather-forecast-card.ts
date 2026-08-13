@@ -67,6 +67,8 @@ import "./components/wfc-alerts";
 import "./components/wfc-air-quality";
 import "./components/wfc-pollen";
 import { SolarLookup, fetchSolarForecast, mergeSolarForecast } from "./data/solar";
+import { BandRow, buildForecastBands } from "./data/forecast-bands";
+import { localize } from "./localize/localize";
 
 const DEFAULT_CONFIG: Partial<WeatherForecastCardConfig> = {
   type: "custom:particle-man-card",
@@ -81,7 +83,7 @@ const DEFAULT_CONFIG: Partial<WeatherForecastCardConfig> = {
     scroll_to_selected: true,
   },
   forecast_action: {
-    tap_action: { action: "toggle-forecast" },
+    tap_action: { action: "none" },
     hold_action: { action: "select-forecast-attribute" },
   },
   tap_action: { action: "more-info" },
@@ -94,7 +96,6 @@ export class WeatherForecastCard extends LitElement {
   @state() private config?: WeatherForecastCardConfig;
   @state() private _dailyForecastEvent?: ForecastEvent | undefined;
   @state() private _hourlyForecastEvent?: ForecastEvent | undefined;
-  @state() private _twiceDailyForecastEvent?: ForecastEvent | undefined;
   @state() private _currentItemWidth!: number;
   @state() private _currentForecastType: ForecastType = "daily";
   @state() private _isScrollable = false;
@@ -115,7 +116,6 @@ export class WeatherForecastCard extends LitElement {
 
   private _dailySubscription?: ForecastSubscription;
   private _hourlySubscription?: ForecastSubscription;
-  private _twiceDailySubscription?: ForecastSubscription;
   private _subscriptionRequestId = 0;
   private _subscriptionGeneration = 0;
   private _subscribed = false;
@@ -123,8 +123,6 @@ export class WeatherForecastCard extends LitElement {
 
   private _hourlyForecastData?: ForecastAttribute[];
   private _dailyForecastData?: ForecastAttribute[];
-  /** Populated only when twice_daily runs as a third view ("all" mode). */
-  private _twiceDailyForecastData?: ForecastAttribute[];
 
   private _minForecastItemWidth?: number;
   private _resizeObserver?: ResizeObserver | null = null;
@@ -402,7 +400,6 @@ export class WeatherForecastCard extends LitElement {
       changedProperties.has("_discovery") ||
       changedProperties.has("_dailyForecastEvent") ||
       changedProperties.has("_hourlyForecastEvent") ||
-      changedProperties.has("_twiceDailyForecastEvent") ||
       changedProperties.has("_currentForecastType") ||
       changedProperties.has("_currentItemWidth") ||
       changedProperties.has("_isScrollable")
@@ -456,12 +453,10 @@ export class WeatherForecastCard extends LitElement {
       </hui-warning>`;
     }
 
-    // Renderers need day/night pairing whenever the *visible* view is
-    // twice_daily — whether that is the entity's only daily-like type or the
-    // separately subscribed third view.
+    // Renderers need day/night pairing when the entity's daily-like type is
+    // twice_daily (the fallback for entities without plain daily).
     const isTwiceDailyEntity =
-      getDailyForecastType(stateObject) === "twice_daily" ||
-      this._currentForecastType === "twice_daily";
+      getDailyForecastType(stateObject) === "twice_daily";
     const isChartMode = this.config.forecast?.mode === ForecastMode.Chart;
     const currentForecast = this.getCurrentForecast();
 
@@ -511,7 +506,8 @@ export class WeatherForecastCard extends LitElement {
             : nothing}
           ${this.config.show_forecast === false
             ? nothing
-            : html`<div class="wfc-forecast-container">
+            : html`${this.renderForecastHeader()}
+              <div class="wfc-forecast-container">
                 ${isChartMode
                   ? html`<pmc-forecast-chart
                       @action=${this.onForecastAction}
@@ -523,6 +519,7 @@ export class WeatherForecastCard extends LitElement {
                       .isTwiceDailyEntity=${isTwiceDailyEntity}
                       .itemWidth=${this._currentItemWidth}
                       .isScrollable=${this._isScrollable}
+                      .bandRows=${this.computeForecastBands(currentForecast)}
                     ></pmc-forecast-chart>`
                   : html`<pmc-forecast-simple
                       @action=${this.onForecastAction}
@@ -623,17 +620,8 @@ export class WeatherForecastCard extends LitElement {
       this._dailyForecastEvent,
       getDailyForecastType(weatherEntity)
     );
-    const twiceDailyForecastData = getForecast(
-      attributes,
-      this._twiceDailyForecastEvent,
-      "twice_daily"
-    );
-
-    if (!hourlyForecastData && !dailyForecastData && !twiceDailyForecastData) {
+    if (!hourlyForecastData && !dailyForecastData) {
       return;
-    }
-    if (twiceDailyForecastData) {
-      this._twiceDailyForecastData = twiceDailyForecastData.forecast;
     }
 
     this._dailyForecastData = dailyForecastData?.forecast;
@@ -678,13 +666,6 @@ export class WeatherForecastCard extends LitElement {
       if (this._dailyForecastData) {
         this._dailyForecastData = mergeSolarForecast(
           this._dailyForecastData,
-          this._solarLookup,
-          "daily"
-        );
-      }
-      if (this._twiceDailyForecastData) {
-        this._twiceDailyForecastData = mergeSolarForecast(
-          this._twiceDailyForecastData,
           this._solarLookup,
           "daily"
         );
@@ -751,12 +732,56 @@ export class WeatherForecastCard extends LitElement {
     if (this._hourlyForecastData?.length) {
       views.push("hourly");
     }
-    // Third view only when separately subscribed — otherwise twice_daily is
-    // already the daily slot and adding it would duplicate a view.
-    if (this._twiceDailyForecastData?.length) {
-      views.push("twice_daily");
-    }
     return views;
+  }
+
+  /**
+   * Forecast panel header: title + the view switcher. The active view is lit,
+   * the other demoted; tapping a label selects it directly and tapping the
+   * group cycles. The chart body itself belongs to the tooltip/scrub gesture.
+   */
+  private renderForecastHeader(): TemplateResult | typeof nothing {
+    const views = this.availableForecastViews();
+    const labelFor = (view: ForecastType) =>
+      localize(this.hass, view === "hourly" ? "forecast.hourly" : "forecast.daily");
+    return html`
+      <div class="pmc-panel-header pmc-forecast-header">
+        <span class="pmc-panel-title">
+          ${localize(this.hass, "forecast.title")}
+        </span>
+        ${views.length > 1
+          ? html`<button
+              class="pmc-views"
+              @click=${() => this._toggleForecastView()}
+            >
+              ${views.map(
+                (view) => html`<span
+                  class="view ${view === this._currentForecastType
+                    ? "active"
+                    : ""}"
+                  @click=${(ev: Event) => {
+                    ev.stopPropagation();
+                    this._currentForecastType = view;
+                  }}
+                  >${labelFor(view)}</span
+                >`
+              )}
+            </button>`
+          : nothing}
+      </div>
+    `;
+  }
+
+  private computeForecastBands(slots: ForecastAttribute[]): BandRow[] {
+    if (!this.hass) {
+      return [];
+    }
+    return buildForecastBands(
+      this.hass,
+      this._discovery,
+      slots,
+      this._currentForecastType === "hourly" ? "hourly" : "daily"
+    );
   }
 
   private _toggleForecastView(selectedForecast?: ForecastAttribute) {
@@ -829,7 +854,6 @@ export class WeatherForecastCard extends LitElement {
 
     const dailySubscription = this._dailySubscription;
     const hourlySubscription = this._hourlySubscription;
-    const twiceDailySubscription = this._twiceDailySubscription;
 
     this._subscribed = false;
 
@@ -837,7 +861,6 @@ export class WeatherForecastCard extends LitElement {
     // accidentally unsubscribe handles already being retired by this generation.
     this._dailySubscription = undefined;
     this._hourlySubscription = undefined;
-    this._twiceDailySubscription = undefined;
 
     // Once we have fully torn down while detached, stop listening for visibility
     // changes so a discarded card is not retained by the document-level listener.
@@ -852,7 +875,6 @@ export class WeatherForecastCard extends LitElement {
     await Promise.all([
       this.unsubscribeForecastSubscription(dailySubscription, "daily"),
       this.unsubscribeForecastSubscription(hourlySubscription, "hourly"),
-      this.unsubscribeForecastSubscription(twiceDailySubscription, "twice_daily"),
     ]);
   }
 
@@ -990,8 +1012,12 @@ export class WeatherForecastCard extends LitElement {
     // Limit which forecast types we subscribe to. Each subscription makes HA
     // re-broadcast its full forecast array on every weather state change, so
     // skipping an unused type avoids needless websocket load (issue #129).
-    const forecastTypes: ForecastTypesOption =
+    // "all" was the removed twice-daily third-view mode; treat it as "both"
+    // so existing configs keep working.
+    const rawForecastTypes: ForecastTypesOption =
       this.config.forecast_types ?? "both";
+    const forecastTypes: ForecastTypesOption =
+      rawForecastTypes === "all" ? "both" : rawForecastTypes;
     const subscribeDaily = forecastTypes !== "hourly";
     const subscribeHourly = forecastTypes !== "daily";
 
@@ -1031,29 +1057,6 @@ export class WeatherForecastCard extends LitElement {
       );
     }
 
-    // A separate twice_daily subscription only makes sense when daily won the
-    // daily slot — otherwise the slot already carries twice_daily data.
-    if (
-      forecastTypes === "all" &&
-      effectiveDailyType === "daily" &&
-      supportsForecastType(weatherEntity, "twice_daily")
-    ) {
-      this._twiceDailySubscription = this.createForecastSubscription(
-        "twice_daily",
-        (event) => {
-          if (!this.shouldHandleForecastEvent(subscriptionGeneration)) {
-            return;
-          }
-
-          this._twiceDailyForecastEvent = event;
-          this.processForecastData();
-        },
-        () => {
-          this._twiceDailyForecastEvent = undefined;
-        }
-      );
-    }
-
     if (subscribeHourly && supportsForecastType(weatherEntity, "hourly")) {
       this._hourlySubscription = this.createForecastSubscription(
         "hourly",
@@ -1077,9 +1080,8 @@ export class WeatherForecastCard extends LitElement {
       return this._hourlyForecastData || [];
     }
     if (this._currentForecastType === "twice_daily") {
-      // Third-view data when subscribed separately; otherwise the daily slot
-      // already carries twice_daily (the fallback for entities without daily).
-      return this._twiceDailyForecastData || this._dailyForecastData || [];
+      // The daily slot carries twice_daily for entities without plain daily.
+      return this._dailyForecastData || [];
     }
     return this._dailyForecastData || [];
   }

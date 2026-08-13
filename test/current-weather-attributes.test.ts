@@ -49,33 +49,33 @@ describe("wfc-current-weather attributes", () => {
 
   it("does not render attributes when config is missing", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${baseConfig}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    expect(el.querySelector("wfc-current-weather-attributes")).toBeNull();
+    expect(el.querySelector("pmc-current-weather-attributes")).toBeNull();
   });
 
   it("renders all default attributes when enabled", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
           ...baseConfig,
           current: { show_attributes: true },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const items = attrEl?.querySelectorAll(".wfc-current-attribute");
@@ -118,19 +118,19 @@ describe("wfc-current-weather attributes", () => {
 
   it("respects attribute list when string provided", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
           ...baseConfig,
           current: { show_attributes: "wind_speed" },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const items = attrEl?.querySelectorAll(".wfc-current-attribute");
@@ -155,19 +155,19 @@ describe("wfc-current-weather attributes", () => {
     hass.locale.number_format = NumberFormat.decimal_comma;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
           ...baseConfig,
           current: { show_attributes: true },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const items = attrEl?.querySelectorAll(".wfc-current-attribute");
@@ -184,7 +184,7 @@ describe("wfc-current-weather attributes", () => {
     // The HA editor inserts a null placeholder when a new list item is added,
     // before a value is chosen. These must not crash the render.
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -197,12 +197,12 @@ describe("wfc-current-weather attributes", () => {
             ] as unknown as CurrentWeatherAttributeConfig[],
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const items = attrEl?.querySelectorAll(".wfc-current-attribute");
@@ -242,7 +242,7 @@ describe("compact attributes layout", () => {
     layout?: "default" | "compact"
   ): Promise<Element> => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -252,12 +252,12 @@ describe("compact attributes layout", () => {
             ...(layout ? { attributes_layout: layout } : {}),
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
     return attrEl!;
   };
@@ -370,7 +370,7 @@ describe("secondary_info_attribute", () => {
     testHass.states["weather.demo"] = weatherEntity;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${testHass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -378,7 +378,7 @@ describe("secondary_info_attribute", () => {
           current: { secondary_info_attribute: "humidity" },
         }}
         .hourlyForecast=${mockHass.hourlyForecast}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
@@ -396,7 +396,7 @@ describe("secondary_info_attribute", () => {
     testHass.states["weather.demo"] = weatherEntity;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${testHass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -404,7 +404,7 @@ describe("secondary_info_attribute", () => {
           current: { secondary_info_attribute: "humidity" },
         }}
         .hourlyForecast=${mockHass.hourlyForecast}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
@@ -421,7 +421,7 @@ describe("secondary_info_attribute", () => {
     testHass.states["weather.demo"] = weatherEntity;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${testHass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -429,7 +429,7 @@ describe("secondary_info_attribute", () => {
           current: { secondary_info_attribute: "wind_speed" },
         }}
         .hourlyForecast=${mockHass.hourlyForecast}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
@@ -448,7 +448,7 @@ describe("secondary_info_attribute", () => {
     testHass.states["weather.demo"] = weatherEntity;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${testHass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -456,7 +456,7 @@ describe("secondary_info_attribute", () => {
           current: { secondary_info_attribute: "dew_point" },
         }}
         .hourlyForecast=${mockHass.hourlyForecast}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
@@ -475,7 +475,7 @@ describe("secondary_info_attribute", () => {
     testHass.states["weather.demo"] = weatherEntity;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${testHass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -483,7 +483,7 @@ describe("secondary_info_attribute", () => {
           current: { secondary_info_attribute: "apparent_temperature" },
         }}
         .hourlyForecast=${mockHass.hourlyForecast}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
@@ -502,7 +502,7 @@ describe("secondary_info_attribute", () => {
     testHass.states["weather.demo"] = weatherEntity;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${testHass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -510,7 +510,7 @@ describe("secondary_info_attribute", () => {
           current: { secondary_info_attribute: "pressure" },
         }}
         .hourlyForecast=${mockHass.hourlyForecast}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
@@ -532,7 +532,7 @@ describe("secondary_info_attribute", () => {
     testHass.states["weather.demo"] = weatherEntity;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${testHass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -544,7 +544,7 @@ describe("secondary_info_attribute", () => {
           },
         }}
         .hourlyForecast=${mockHass.hourlyForecast}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
@@ -593,7 +593,7 @@ describe("secondary_info_attribute", () => {
     testHass.states["weather.demo"] = weatherEntity;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${testHass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -602,7 +602,7 @@ describe("secondary_info_attribute", () => {
         }}
         .hourlyForecast=${mockHass.hourlyForecast}
         .dailyForecast=${mockHass.dailyForecast}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
@@ -632,12 +632,12 @@ describe("secondary_info_attribute", () => {
     testHass.states["weather.demo"] = weatherEntity;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${testHass}
         .weatherEntity=${weatherEntity}
         .config=${baseConfig}
         .hourlyForecast=${mockHass.hourlyForecast}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
@@ -680,13 +680,13 @@ describe("secondary_info_attribute", () => {
     testHass.states["weather.demo"] = weatherEntity;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${testHass}
         .weatherEntity=${weatherEntity}
         .config=${baseConfig}
         .hourlyForecast=${mockHass.hourlyForecast}
         .dailyForecast=${mockHass.dailyForecast}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
@@ -709,7 +709,7 @@ describe("secondary_info_attribute", () => {
     testHass.states["weather.demo"] = weatherEntity;
 
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${testHass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -717,7 +717,7 @@ describe("secondary_info_attribute", () => {
           current: { secondary_info_attribute: "humidity" },
         }}
         .hourlyForecast=${mockHass.hourlyForecast}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
@@ -765,7 +765,7 @@ describe("custom entity attributes", () => {
 
   it("renders custom entity value for humidity attribute", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -776,12 +776,12 @@ describe("custom entity attributes", () => {
             ],
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const value = attrEl!.querySelector(
@@ -792,7 +792,7 @@ describe("custom entity attributes", () => {
 
   it("renders custom entity value for pressure attribute", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -803,12 +803,12 @@ describe("custom entity attributes", () => {
             ],
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const value = attrEl!.querySelector(
@@ -819,7 +819,7 @@ describe("custom entity attributes", () => {
 
   it("renders custom entity value for wind_speed with bearing from weather entity", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -830,12 +830,12 @@ describe("custom entity attributes", () => {
             ],
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const value = attrEl!.querySelector(
@@ -846,7 +846,7 @@ describe("custom entity attributes", () => {
 
   it("renders custom entity value for dew_point with temperature precision", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -858,12 +858,12 @@ describe("custom entity attributes", () => {
             temperature_precision: 1,
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const value = attrEl!.querySelector(
@@ -874,7 +874,7 @@ describe("custom entity attributes", () => {
 
   it("renders mixed format config (strings and objects)", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -886,12 +886,12 @@ describe("custom entity attributes", () => {
             ] as (string | CurrentWeatherAttributeConfig)[],
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const values = Array.from(
@@ -904,7 +904,7 @@ describe("custom entity attributes", () => {
 
   it("renders single object config format", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -916,12 +916,12 @@ describe("custom entity attributes", () => {
             } as CurrentWeatherAttributeConfig,
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const value = attrEl!.querySelector(
@@ -932,7 +932,7 @@ describe("custom entity attributes", () => {
 
   it("renders entity-only items (no name) from the entity state", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -948,12 +948,12 @@ describe("custom entity attributes", () => {
             ] as CurrentWeatherAttributeConfig[],
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const items = attrEl?.querySelectorAll(".wfc-current-attribute");
@@ -976,7 +976,7 @@ describe("custom entity attributes", () => {
 
   it("delegates entity-only icons to ha-state-icon instead of forcing mdi:gauge", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -987,12 +987,12 @@ describe("custom entity attributes", () => {
             ] as CurrentWeatherAttributeConfig[],
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes")!;
+    const attrEl = el.querySelector("pmc-current-weather-attributes")!;
 
     // The entity's own icon is resolved by HA, not force-fed as mdi:gauge.
     expect(attrEl.querySelector("ha-attribute-icon")).toBeNull();
@@ -1008,7 +1008,7 @@ describe("custom entity attributes", () => {
 
   it("passes an explicit icon through to ha-state-icon for entity-only items", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -1019,12 +1019,12 @@ describe("custom entity attributes", () => {
             ] as CurrentWeatherAttributeConfig[],
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes")!;
+    const attrEl = el.querySelector("pmc-current-weather-attributes")!;
     const stateIcon = attrEl.querySelector("ha-state-icon");
     expect(stateIcon).not.toBeNull();
     // @ts-expect-error mock property
@@ -1033,7 +1033,7 @@ describe("custom entity attributes", () => {
 
   it("keeps the weather-attribute icon for an attribute backed by a custom entity", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -1044,12 +1044,12 @@ describe("custom entity attributes", () => {
             ] as CurrentWeatherAttributeConfig[],
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes")!;
+    const attrEl = el.querySelector("pmc-current-weather-attributes")!;
     // A named attribute keeps the attribute icon so it matches its label.
     expect(attrEl.querySelector("ha-state-icon")).toBeNull();
 
@@ -1061,7 +1061,7 @@ describe("custom entity attributes", () => {
 
   it("skips attribute when custom entity is unavailable", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -1073,12 +1073,12 @@ describe("custom entity attributes", () => {
             ] as (string | CurrentWeatherAttributeConfig)[],
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const items = attrEl?.querySelectorAll(".wfc-current-attribute");
@@ -1093,7 +1093,7 @@ describe("custom entity attributes", () => {
 
   it("skips attribute when custom entity does not exist", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
@@ -1105,12 +1105,12 @@ describe("custom entity attributes", () => {
             ] as (string | CurrentWeatherAttributeConfig)[],
           },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const items = attrEl?.querySelectorAll(".wfc-current-attribute");
@@ -1120,19 +1120,19 @@ describe("custom entity attributes", () => {
 
   it("maintains backwards compatibility with boolean config", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
           ...baseConfig,
           current: { show_attributes: true },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     // Should show all available attributes from weather entity
@@ -1142,19 +1142,19 @@ describe("custom entity attributes", () => {
 
   it("maintains backwards compatibility with string array config", async () => {
     const el = await fixture<WfcCurrentWeather>(
-      html`<wfc-current-weather
+      html`<pmc-current-weather
         .hass=${hass}
         .weatherEntity=${weatherEntity}
         .config=${{
           ...baseConfig,
           current: { show_attributes: ["humidity", "pressure"] },
         }}
-      ></wfc-current-weather>`
+      ></pmc-current-weather>`
     );
 
     await el.updateComplete;
 
-    const attrEl = el.querySelector("wfc-current-weather-attributes");
+    const attrEl = el.querySelector("pmc-current-weather-attributes");
     expect(attrEl).not.toBeNull();
 
     const items = attrEl?.querySelectorAll(".wfc-current-attribute");

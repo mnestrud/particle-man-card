@@ -9,6 +9,7 @@ const ALERT = {
   title: "Tornado Warning",
   event_type: "TORNADO_WARNING",
   severity: "EXTREME",
+  severity_rank: 3,
   area: "King County",
   expiration_time: "2026-08-12T20:00:00Z",
   description: "A tornado has been sighted.",
@@ -45,60 +46,60 @@ describe("wfc-alerts", () => {
 
   it("renders nothing when there are no alerts", async () => {
     const el = await mount([]);
-    expect(el.querySelector(".wfc-alerts")).toBeNull();
+    expect(el.querySelector(".pmc-alerts")).toBeNull();
   });
 
   it("renders a banner with the alert title and severity", async () => {
     const el = await mount([ALERT]);
-    expect(el.querySelector(".wfc-alerts")).not.toBeNull();
-    expect(el.querySelector(".wfc-alerts-banner-text")?.textContent).toContain(
+    expect(el.querySelector(".pmc-alerts")).not.toBeNull();
+    expect(el.querySelector(".pmc-alerts-banner-text")?.textContent).toContain(
       "Tornado Warning"
     );
     expect(
-      el.querySelector(".wfc-alerts-severity-label")?.textContent?.trim()
+      el.querySelector(".pmc-alerts-banner .pmc-chip")?.textContent?.trim()
     ).toBe("Extreme");
-    expect(el.querySelector(".wfc-alerts")?.classList.contains(
-      "wfc-alerts-extreme"
+    expect(el.querySelector(".pmc-alerts")?.classList.contains(
+      "pmc-alerts-extreme"
     )).toBe(true);
   });
 
   it("shows a count when multiple alerts are active", async () => {
     const el = await mount([
       ALERT,
-      { ...ALERT, title: "Flood Watch", severity: "MODERATE" },
+      { ...ALERT, title: "Flood Watch", severity: "MODERATE", severity_rank: 1 },
     ]);
-    expect(el.querySelector(".wfc-alerts-banner-text")?.textContent).toContain(
+    expect(el.querySelector(".pmc-alerts-banner-text")?.textContent).toContain(
       "2 active alerts"
     );
   });
 
   it("colors by the worst severity when multiple are active", async () => {
     const el = await mount([
-      { ...ALERT, title: "Flood Watch", severity: "MODERATE" },
+      { ...ALERT, title: "Flood Watch", severity: "MODERATE", severity_rank: 1 },
       ALERT, // EXTREME, listed second — must still win
     ]);
     expect(
-      el.querySelector(".wfc-alerts")?.classList.contains("wfc-alerts-extreme")
+      el.querySelector(".pmc-alerts")?.classList.contains("pmc-alerts-extreme")
     ).toBe(true);
   });
 
   it("expands to show description and instructions on tap", async () => {
     const el = await mount([ALERT]);
-    expect(el.querySelector(".wfc-alerts-list")).toBeNull();
+    expect(el.querySelector(".pmc-alerts-list")).toBeNull();
 
-    el.querySelector<HTMLButtonElement>(".wfc-alerts-banner")?.click();
+    el.querySelector<HTMLButtonElement>(".pmc-alerts-banner")?.click();
     await el.updateComplete;
 
     expect(
-      el.querySelector(".wfc-alerts-item-description")?.textContent
+      el.querySelector(".pmc-alerts-item-description")?.textContent
     ).toContain("tornado has been sighted");
     expect(
-      el.querySelector(".wfc-alerts-item-instruction")?.textContent
+      el.querySelector(".pmc-alerts-item-instruction")?.textContent
     ).toContain("Take shelter now");
   });
 
   it("survives a malformed alerts attribute", async () => {
     const el = await mount("not-a-list");
-    expect(el.querySelector(".wfc-alerts")).toBeNull();
+    expect(el.querySelector(".pmc-alerts")).toBeNull();
   });
 });

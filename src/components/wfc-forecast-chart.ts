@@ -29,6 +29,7 @@ import {
   WeatherEntity,
 } from "../data/weather";
 import { getUvIndexColor } from "../data/uv-index";
+import { BandRow as BandRowData } from "../data/forecast-bands";
 import {
   LineController,
   LineElement,
@@ -43,6 +44,7 @@ import {
   Color,
   ChartDataset,
   ChartOptions,
+  Tooltip,
 } from "chart.js";
 
 import "./wfc-forecast-header-items";
@@ -57,6 +59,7 @@ Chart.register(
   PointElement,
   LinearScale,
   CategoryScale,
+  Tooltip,
   ChartDataLabels
 );
 
@@ -114,6 +117,7 @@ export class WfcForecastChart extends LitElement {
   @property({ attribute: false }) isTwiceDailyEntity = false;
   @property({ attribute: false }) itemWidth: number = 0;
   @property({ attribute: false }) isScrollable = false;
+  @property({ attribute: false }) bandRows: BandRowData[] = [];
   @query("canvas") private _canvas?: HTMLCanvasElement;
 
   @state() private _settingsOpen = false;
@@ -284,6 +288,27 @@ export class WfcForecastChart extends LitElement {
               `
             )}
           </div>
+
+          ${this.bandRows
+            .filter((row) => row.colors.length === forecast.length)
+            .map(
+              (row) => html`
+                <div class="pmc-chart-band-row">
+                  ${row.colors.map(
+                    (color) => html`
+                      <div class="pmc-band-slot">
+                        <div
+                          class="pmc-chart-band-cell"
+                          style=${styleMap({
+                            "--row-color": color ?? "transparent",
+                          })}
+                        ></div>
+                      </div>
+                    `
+                  )}
+                </div>
+              `
+            )}
         </div>
       </div>
     `;
@@ -376,10 +401,21 @@ export class WfcForecastChart extends LitElement {
     const baseOptions: ChartOptions = {
       responsive: true,
       maintainAspectRatio: false,
+      // Tap snaps to the nearest slot, horizontal drag scrubs; the chart body
+      // owns this gesture now that view cycling lives in the panel header.
+      interaction: { mode: "index", intersect: false },
       plugins: {
         datalabels: {
           font: {
             size: fontSize,
+          },
+        },
+        tooltip: {
+          enabled: true,
+          displayColors: false,
+          callbacks: {
+            title: (items) =>
+              items.length ? this.formatTooltipTitle(String(items[0]!.label)) : "",
           },
         },
       },
@@ -455,6 +491,29 @@ export class WfcForecastChart extends LitElement {
     const tempLineStyle = this.getTemperatureLineStyle(style, "temperature");
     const templowLineStyle = this.getTemperatureLineStyle(style, "templow");
 
+    // Baseline temp treatment (approved mockups): in the hourly view only the
+    // day's high, low and the current slot get on-line labels — everything in
+    // between reads from the tooltip. Daily views keep per-day labels.
+    const temps = data.map((f) => f.temperature);
+    const validTemps = temps.filter((t): t is number => typeof t === "number");
+    const hiIndex = validTemps.length ? temps.indexOf(Math.max(...validTemps)) : -1;
+    const loIndex = validTemps.length ? temps.indexOf(Math.min(...validTemps)) : -1;
+    const sparseHourlyLabels = this.forecastType === "hourly";
+    const showTempLabel = (index: number): boolean =>
+      !sparseHourlyLabels ||
+      index === 0 ||
+      index === hiIndex ||
+      index === loIndex;
+    const tempLabelPrefix = (index: number): string => {
+      if (!sparseHourlyLabels || index === 0) {
+        return "";
+      }
+      if (index === hiIndex) {
+        return "H ";
+      }
+      return index === loIndex ? "L " : "";
+    };
+
     return {
       type: "line",
       data: {
@@ -467,9 +526,10 @@ export class WfcForecastChart extends LitElement {
               anchor: "end",
               align: "top",
               color: highTempLabelColor,
-              formatter: (value) =>
+              display: (ctx) => showTempLabel(ctx.dataIndex),
+              formatter: (value, ctx) =>
                 value != null
-                  ? `${formatTemperature(this.hass, this.weatherEntity, value, this.config.forecast?.temperature_precision, true)}°`
+                  ? `${tempLabelPrefix(ctx.dataIndex)}${formatTemperature(this.hass, this.weatherEntity, value, this.config.forecast?.temperature_precision, true)}°`
                   : null,
             },
             ...tempLineStyle,
@@ -669,6 +729,25 @@ export class WfcForecastChart extends LitElement {
         },
       }),
     };
+  }
+
+  private formatTooltipTitle(label: string): string {
+    const date = new Date(label);
+    if (Number.isNaN(date.getTime())) {
+      return label;
+    }
+    const language = this.hass?.locale?.language;
+    return this.forecastType === "hourly"
+      ? date.toLocaleString(language, {
+          weekday: "short",
+          hour: "numeric",
+          minute: "2-digit",
+        })
+      : date.toLocaleDateString(language, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        });
   }
 
   private getTemperatureLineStyle(

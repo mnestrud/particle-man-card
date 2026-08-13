@@ -122,6 +122,34 @@ export const colorOf = (entity: ClassifiedEntity): string | null => {
   return typeof color === "string" && color.length > 0 ? color : null;
 };
 
+/** Harmonized rank within the entity's own canonical scale (v1.7.0+). */
+export const severityOf = (entity: ClassifiedEntity): number | null => {
+  const severity = entity.state.attributes.severity;
+  return typeof severity === "number" ? severity : null;
+};
+
+export const severityMaxOf = (entity: ClassifiedEntity): number | null => {
+  const max = entity.state.attributes.severity_max;
+  return typeof max === "number" && max > 0 ? max : null;
+};
+
+/**
+ * The integration's action-level verdict. Only an explicit `true` counts as
+ * quiet — absent/null (pre-1.7.0 integration, unmapped scales) keeps the row
+ * visible rather than silently hiding data.
+ */
+export const isQuiet = (entity: ClassifiedEntity): boolean =>
+  entity.state.attributes.below_action_level === true;
+
+/** Registry original_name — the entity's own name without the device prefix. */
+export const shortNameOf = (
+  entity: ClassifiedEntity,
+  discovered: DiscoveredEntity[]
+): string => {
+  const match = discovered.find((d) => d.entityId === entity.entityId);
+  return match?.originalName ?? friendlyNameOf(entity);
+};
+
 export const categoryOf = (entity: ClassifiedEntity): string | null => {
   const category = entity.state.attributes.category;
   return typeof category === "string" && category.length > 0 ? category : null;

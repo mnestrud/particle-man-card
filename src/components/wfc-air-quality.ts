@@ -4,20 +4,26 @@ import { styleMap } from "lit/directives/style-map.js";
 import { HomeAssistant } from "custom-card-helpers";
 import { DiscoveryResult } from "../data/entity-discovery";
 import {
+  ClassifiedEntity,
   categoryOf,
   classifyAirQuality,
   colorOf,
-  friendlyNameOf,
+  isQuiet,
+  severityMaxOf,
+  severityOf,
+  shortNameOf,
 } from "../data/panel-entities";
+import { barRow, scaleBar } from "./bar";
 import { localize } from "../localize/localize";
 
 /**
- * Air quality panel: Universal AQI headline with category color, dominant
- * pollutant, a pollutant grid, and expandable health recommendations.
+ * Air quality panel, dense-bar design language (see design/full-card-*.html):
+ * hero numeral + category + segmented UAQI scale, then one severity bar per
+ * pollutant above its action level, with the quiet ones collapsed into an
+ * expandable footer so absence reads as checked-and-fine.
  *
- * Category colors come from the integration's `color_hex` attributes (EPA
- * palette) — swatches only, never text/background, since fixed hexes ignore
- * the theme.
+ * All colors are integration `color_hex`, bar lengths severity/severity_max —
+ * no thresholds or vocabulary live here.
  */
 @customElement("wfc-air-quality")
 export class WfcAirQuality extends LitElement {
@@ -25,6 +31,7 @@ export class WfcAirQuality extends LitElement {
   @property({ attribute: false }) public discovery?: DiscoveryResult;
 
   @state() private showHealth = false;
+  @state() private showQuiet = false;
 
   protected createRenderRoot(): HTMLElement | DocumentFragment {
     return this;
@@ -35,112 +42,124 @@ export class WfcAirQuality extends LitElement {
       return nothing;
     }
     if (!this.discovery) {
-      return html`<div class="wfc-panel wfc-air-quality">
-        <div class="wfc-panel-empty">
+      return html`<div class="pmc-panel">
+        <div class="pmc-panel-empty">
           ${localize(this.hass, "panel.discovering")}
         </div>
       </div>`;
     }
-    const { aqi, advisory, pollutants } = classifyAirQuality(
+    const { aqi, pollutants } = classifyAirQuality(
       this.hass,
       this.discovery.entities
     );
     if (!aqi && pollutants.length === 0) {
-      return html`<div class="wfc-panel wfc-air-quality">
-        <div class="wfc-panel-empty">
+      return html`<div class="pmc-panel">
+        <div class="pmc-panel-empty">
           ${localize(this.hass, "panel.no_entities")}
         </div>
       </div>`;
     }
 
     const aqiAttrs = (aqi?.state.attributes ?? {}) as Record<string, unknown>;
-    const dominant = aqiAttrs.dominant_pollutant;
+    const trend = typeof aqiAttrs.trend === "string" ? aqiAttrs.trend : "";
     const health = aqiAttrs.health_recommendations;
     const healthText =
       typeof health === "string"
         ? health
         : typeof health === "object" && health !== null
           ? String(
-              (health as Record<string, unknown>).general_population ?? ""
+              (health as Record<string, unknown>).generalPopulation ??
+                (health as Record<string, unknown>).general_population ??
+                ""
             )
           : "";
 
+    const bySeverity = (a: ClassifiedEntity, b: ClassifiedEntity) =>
+      (severityOf(b) ?? -1) - (severityOf(a) ?? -1);
+    const active = pollutants.filter((p) => !isQuiet(p)).sort(bySeverity);
+    const quiet = pollutants.filter((p) => isQuiet(p)).sort(bySeverity);
+
     return html`
-      <div class="wfc-panel wfc-air-quality">
-        <div class="wfc-panel-header">
-          <span class="wfc-panel-title">
-            ${localize(this.hass, "air_quality.title")}
-          </span>
-          ${aqi
-            ? html`<span class="wfc-panel-headline">
-                <span
-                  class="wfc-swatch"
-                  style=${styleMap({
-                    background:
-                      colorOf(aqi) ?? "var(--disabled-color)",
-                  })}
-                ></span>
-                ${localize(this.hass, "air_quality.aqi")}
-                ${aqi.state.state}${categoryOf(aqi)
-                  ? html` · ${categoryOf(aqi)}`
-                  : nothing}
-              </span>`
-            : nothing}
-        </div>
-        ${advisory
-          ? html`<div class="wfc-aq-advisory">${advisory.state.state}</div>`
-          : nothing}
-        ${typeof dominant === "string" && dominant
-          ? html`<div class="wfc-aq-dominant">
-              ${localize(this.hass, "air_quality.dominant")}:
-              <b>${dominant.toUpperCase()}</b>
+      <div class="pmc-panel pmc-air-quality">
+        <span class="pmc-panel-title">
+          ${localize(this.hass, "air_quality.title")}
+        </span>
+        ${aqi ? this.renderHero(aqi, trend) : nothing}
+        ${active.length || (this.showQuiet && quiet.length)
+          ? html`<div class="pmc-rows">
+              ${active.map((p) => this.renderPollutant(p))}
+              ${this.showQuiet
+                ? quiet.map((p) => this.renderPollutant(p))
+                : nothing}
             </div>`
           : nothing}
-        ${pollutants.length
-          ? html`<div class="wfc-aq-pollutants">
-              ${pollutants.map(
-                (pollutant) => html`
-                  <div class="wfc-aq-pollutant">
-                    <span
-                      class="wfc-swatch"
-                      style=${styleMap({
-                        background:
-                          colorOf(pollutant) ?? "var(--disabled-color)",
-                      })}
-                    ></span>
-                    <span class="wfc-aq-pollutant-name">
-                      ${friendlyNameOf(pollutant)}
-                    </span>
-                    <span class="wfc-aq-pollutant-value">
-                      ${pollutant.state.state}
-                      ${pollutant.state.attributes.unit_of_measurement ?? ""}
-                    </span>
-                  </div>
-                `
-              )}
-            </div>`
+        ${quiet.length
+          ? html`<button
+              class="pmc-footer"
+              @click=${() => (this.showQuiet = !this.showQuiet)}
+              aria-expanded=${this.showQuiet}
+            >
+              ${localize(this.hass, "panel.quiet")}:
+              ${quiet.map((p) => this.shortName(p)).join(" · ")}
+              ${this.showQuiet ? "▴" : "▾"}
+            </button>`
           : nothing}
         ${healthText
           ? html`
               <button
-                class="wfc-aq-health-toggle"
+                class="pmc-footer"
                 @click=${() => (this.showHealth = !this.showHealth)}
                 aria-expanded=${this.showHealth}
               >
                 ${localize(this.hass, "air_quality.health")}
-                <ha-icon
-                  icon=${this.showHealth
-                    ? "mdi:chevron-up"
-                    : "mdi:chevron-down"}
-                ></ha-icon>
+                ${this.showHealth ? "▴" : "▾"}
               </button>
               ${this.showHealth
-                ? html`<div class="wfc-aq-health">${healthText}</div>`
+                ? html`<div class="pmc-health">${healthText}</div>`
                 : nothing}
             `
           : nothing}
       </div>
     `;
+  }
+
+  private renderHero(aqi: ClassifiedEntity, trend: string): TemplateResult {
+    const color = colorOf(aqi);
+    const meta = [localize(this.hass, "air_quality.universal_aqi"), trend]
+      .filter(Boolean)
+      .join(" · ");
+    return html`
+      <div
+        class="pmc-hero"
+        style=${styleMap({ "--row-color": color ?? "var(--disabled-color)" })}
+      >
+        <span class="pmc-hero-value">${aqi.state.state}</span>
+        <span class="pmc-hero-category">
+          <span class="pmc-swatch"></span>${categoryOf(aqi) ?? ""}
+        </span>
+        <span class="pmc-hero-meta">${meta}</span>
+      </div>
+      ${scaleBar(severityOf(aqi), severityMaxOf(aqi), color)}
+    `;
+  }
+
+  private shortName(entity: ClassifiedEntity): string {
+    return shortNameOf(entity, this.discovery?.entities ?? []);
+  }
+
+  private renderPollutant(pollutant: ClassifiedEntity): TemplateResult {
+    const dominant = pollutant.state.attributes.is_dominant === true;
+    return barRow({
+      label: this.shortName(pollutant),
+      color: colorOf(pollutant),
+      severity: severityOf(pollutant),
+      severityMax: severityMaxOf(pollutant),
+      value: pollutant.state.state,
+      unit: (pollutant.state.attributes.unit_of_measurement as string) ?? "",
+      chip: dominant
+        ? localize(this.hass, "air_quality.dominant_chip")
+        : undefined,
+    });
   }
 }
 

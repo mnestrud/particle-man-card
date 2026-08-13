@@ -22,6 +22,7 @@ describe("time format rendering", () => {
   const testConfig: WeatherForecastCardConfig = {
     type: "custom:particle-man-card",
     entity: "weather.demo",
+    forecast_action: { tap_action: { action: "toggle-forecast" } },
     forecast: {
       mode: ForecastMode.Simple,
       show_sun_times: false,
@@ -47,7 +48,7 @@ describe("time format rendering", () => {
 
       // Dispatch action event to switch to hourly (actionHandler doesn't work in test env)
       const forecastElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart, wfc-forecast-simple"
+        "pmc-forecast-chart, pmc-forecast-simple"
       );
       forecastElement?.dispatchEvent(
         new CustomEvent("action", {
@@ -126,7 +127,7 @@ describe("time format rendering", () => {
 
       // Dispatch action event to switch to hourly (actionHandler doesn't work in test env)
       const forecastElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart, wfc-forecast-simple"
+        "pmc-forecast-chart, pmc-forecast-simple"
       );
       forecastElement?.dispatchEvent(
         new CustomEvent("action", {
@@ -294,7 +295,7 @@ describe("time format rendering", () => {
 
       // Dispatch action event to switch to hourly (actionHandler doesn't work in test env)
       const forecastElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart, wfc-forecast-simple"
+        "pmc-forecast-chart, pmc-forecast-simple"
       );
       forecastElement?.dispatchEvent(
         new CustomEvent("action", {
@@ -340,7 +341,7 @@ describe("time format rendering", () => {
 
       // Dispatch action event to switch to hourly (actionHandler doesn't work in test env)
       const forecastElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart, wfc-forecast-simple"
+        "pmc-forecast-chart, pmc-forecast-simple"
       );
       forecastElement?.dispatchEvent(
         new CustomEvent("action", {
@@ -395,7 +396,7 @@ describe("time format rendering", () => {
 
       // Dispatch action event to switch to hourly (actionHandler doesn't work in test env)
       const forecastElement = card.shadowRoot!.querySelector(
-        "wfc-forecast-chart, wfc-forecast-simple"
+        "pmc-forecast-chart, pmc-forecast-simple"
       );
       forecastElement?.dispatchEvent(
         new CustomEvent("action", {

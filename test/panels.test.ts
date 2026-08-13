@@ -43,8 +43,14 @@ const pollenHass = () =>
     locale: { language: "en" },
     states: {
       "sensor.home_pollen_pollen_advisory": {
-        state: "Very Low",
-        attributes: { friendly_name: "Pollen Advisory" },
+        state: "Low",
+        attributes: {
+          friendly_name: "Pollen Advisory",
+          color_hex: "#84CF33",
+          dominant_type: "weed",
+          severity: 2,
+          severity_max: 5,
+        },
       },
       "sensor.home_pollen_tree_pollen": {
         state: "1",
@@ -53,6 +59,9 @@ const pollenHass = () =>
           category: "Very Low",
           color_hex: "#009E3A",
           in_season: true,
+          severity: 1,
+          severity_max: 5,
+          below_action_level: true,
         },
       },
       "sensor.home_pollen_tree_pollen_level": {
@@ -66,6 +75,9 @@ const pollenHass = () =>
           category: "Low",
           color_hex: "#84CF33",
           in_season: true,
+          severity: 2,
+          severity_max: 5,
+          below_action_level: false,
         },
       },
       "sensor.home_pollen_ragweed_pollen": {
@@ -75,6 +87,9 @@ const pollenHass = () =>
           category: "Low",
           color_hex: "#84CF33",
           in_season: true,
+          severity: 2,
+          severity_max: 5,
+          below_action_level: false,
           family: "Asteraceae",
           picture: "https://example.invalid/ragweed.jpg",
         },
@@ -93,7 +108,7 @@ describe("classifyPollen", () => {
       pollenHass(),
       POLLEN_DISCOVERY.entities
     );
-    expect(advisory?.state.state).toBe("Very Low");
+    expect(advisory?.state.state).toBe("Low");
     expect(types.map((t) => t.entityId)).toEqual([
       "sensor.home_pollen_tree_pollen",
       "sensor.home_pollen_weed_pollen",
@@ -136,6 +151,9 @@ const aqHass = () =>
           friendly_name: "Universal AQI",
           category: "Good air quality",
           color_hex: "#00e400",
+          severity: 1,
+          severity_max: 4,
+          below_action_level: true,
           dominant_pollutant: "o3",
           health_recommendations: { general_population: "Enjoy the outdoors." },
         },
@@ -149,11 +167,15 @@ const aqHass = () =>
         attributes: {},
       },
       "sensor.home_pollution_pm2_5": {
-        state: "4.5",
+        state: "18.1",
         attributes: {
           friendly_name: "PM2.5",
-          category: "Good",
-          color_hex: "#00e400",
+          category: "Moderate",
+          color_hex: "#ffff00",
+          severity: 1,
+          severity_max: 5,
+          below_action_level: false,
+          is_dominant: true,
           unit_of_measurement: "µg/m³",
         },
       },
@@ -167,6 +189,9 @@ const aqHass = () =>
           friendly_name: "Ozone",
           category: "Good",
           color_hex: "#00e400",
+          severity: 0,
+          severity_max: 5,
+          below_action_level: true,
           unit_of_measurement: "ppb",
         },
       },
@@ -190,7 +215,7 @@ describe("classifyAirQuality", () => {
 });
 
 describe("wfc-pollen", () => {
-  it("renders tiles from color_hex with no local color logic", async () => {
+  it("draws severity bars from integration attributes, no local color logic", async () => {
     const el = await fixture<WfcPollen>(
       html`<wfc-pollen
         .hass=${pollenHass()}
@@ -199,12 +224,38 @@ describe("wfc-pollen", () => {
     );
     await el.updateComplete;
 
-    const swatch = el.querySelector<HTMLElement>(
-      ".wfc-pollen-tile .wfc-swatch"
+    // Active rows: weed type (UPI 2) + ragweed plant; tree (UPI 1) is quiet.
+    const rows = el.querySelectorAll(".pmc-row");
+    expect(rows.length).toBe(2);
+    const row = rows[0] as HTMLElement;
+    // happy-dom stores raw custom-property values; the point is the fill
+    // color came from color_hex and the width from severity/severity_max.
+    expect(row.style.getPropertyValue("--row-color").toLowerCase()).toBe(
+      "#84cf33"
     );
-    // happy-dom stores the raw value; the point is it came from color_hex.
-    expect(swatch?.style.background.toLowerCase()).toBe("#009e3a");
-    expect(el.textContent).toContain("Very Low");
+    const fill = row.querySelector<HTMLElement>(".pmc-row-bar-fill");
+    expect(fill?.style.width).toBe("40%");
+    // Raw number always shown alongside the category word.
+    expect(row.textContent).toContain("2");
+    expect(row.textContent).toContain("Low");
+  });
+
+  it("collapses quiet rows into the footer and expands them on demand", async () => {
+    const el = await fixture<WfcPollen>(
+      html`<wfc-pollen
+        .hass=${pollenHass()}
+        .discovery=${POLLEN_DISCOVERY}
+      ></wfc-pollen>`
+    );
+    await el.updateComplete;
+
+    const footer = el.querySelector<HTMLButtonElement>("button.pmc-footer");
+    expect(footer?.textContent).toContain("Quiet");
+    expect(footer?.textContent).toContain("Tree Pollen");
+
+    footer?.click();
+    await el.updateComplete;
+    expect(el.querySelectorAll(".pmc-row").length).toBe(3);
   });
 
   it("expands a plant to its botanical detail", async () => {
@@ -216,14 +267,14 @@ describe("wfc-pollen", () => {
     );
     await el.updateComplete;
 
-    el.querySelector<HTMLButtonElement>(".wfc-pollen-plant-row")?.click();
+    el.querySelector<HTMLButtonElement>("button.pmc-row")?.click();
     await el.updateComplete;
 
-    expect(el.querySelector(".wfc-pollen-plant-detail")?.textContent).toContain(
+    expect(el.querySelector(".pmc-detail")?.textContent).toContain(
       "Asteraceae"
     );
     expect(
-      el.querySelector<HTMLImageElement>(".wfc-pollen-plant-picture")?.src
+      el.querySelector<HTMLImageElement>(".pmc-detail img")?.src
     ).toContain("ragweed.jpg");
   });
 
@@ -232,14 +283,14 @@ describe("wfc-pollen", () => {
       html`<wfc-pollen .hass=${pollenHass()}></wfc-pollen>`
     );
     await el.updateComplete;
-    expect(el.querySelector(".wfc-panel-empty")?.textContent).toContain(
+    expect(el.querySelector(".pmc-panel-empty")?.textContent).toContain(
       "Finding sensors"
     );
   });
 });
 
 describe("wfc-air-quality", () => {
-  it("renders the AQI headline, dominant pollutant and grid", async () => {
+  it("renders the hero numeral, segmented scale and active pollutant bars", async () => {
     const el = await fixture<WfcAirQuality>(
       html`<wfc-air-quality
         .hass=${aqHass()}
@@ -248,11 +299,19 @@ describe("wfc-air-quality", () => {
     );
     await el.updateComplete;
 
-    expect(el.querySelector(".wfc-panel-headline")?.textContent).toContain(
-      "65"
+    expect(el.querySelector(".pmc-hero-value")?.textContent).toContain("65");
+    // UAQI severity 1 of 4 → 5 segments, 2 lit.
+    expect(el.querySelectorAll(".pmc-scale-seg")).toHaveLength(5);
+    expect(el.querySelectorAll(".pmc-scale-seg.on")).toHaveLength(2);
+    // Only the elevated PM2.5 gets a bar; Good ozone is quiet.
+    const rows = el.querySelectorAll(".pmc-row");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.textContent).toContain("PM2.5");
+    expect(rows[0]?.querySelector(".pmc-chip")?.textContent).toContain(
+      "dominant"
     );
-    expect(el.querySelector(".wfc-aq-dominant")?.textContent).toContain("O3");
-    expect(el.querySelectorAll(".wfc-aq-pollutant")).toHaveLength(2);
+    const footer = el.querySelector("button.pmc-footer");
+    expect(footer?.textContent).toContain("Ozone");
   });
 
   it("expands health recommendations on demand", async () => {
@@ -264,10 +323,11 @@ describe("wfc-air-quality", () => {
     );
     await el.updateComplete;
 
-    expect(el.querySelector(".wfc-aq-health")).toBeNull();
-    el.querySelector<HTMLButtonElement>(".wfc-aq-health-toggle")?.click();
+    expect(el.querySelector(".pmc-health")).toBeNull();
+    const toggles = el.querySelectorAll<HTMLButtonElement>("button.pmc-footer");
+    toggles[toggles.length - 1]?.click();
     await el.updateComplete;
-    expect(el.querySelector(".wfc-aq-health")?.textContent).toContain(
+    expect(el.querySelector(".pmc-health")?.textContent).toContain(
       "Enjoy the outdoors"
     );
   });

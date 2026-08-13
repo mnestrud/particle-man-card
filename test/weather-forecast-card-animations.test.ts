@@ -272,11 +272,11 @@ describe("weather-forecast-card-animations", () => {
       };
 
       const provider = await fixture<WeatherAnimationProvider>(
-        html`<wfc-animation-provider
+        html`<pmc-animation-provider
           .hass=${hass}
           .config=${config}
           .weatherEntity=${entity}
-        ></wfc-animation-provider>`
+        ></pmc-animation-provider>`
       );
       await provider.updateComplete;
 
@@ -313,12 +313,12 @@ describe("weather-forecast-card-animations", () => {
       } as ForecastAttribute;
 
       const provider = await fixture<WeatherAnimationProvider>(
-        html`<wfc-animation-provider
+        html`<pmc-animation-provider
           .hass=${hass}
           .config=${config}
           .weatherEntity=${entity}
           .currentForecast=${forecast}
-        ></wfc-animation-provider>`
+        ></pmc-animation-provider>`
       );
       await provider.updateComplete;
 
@@ -351,11 +351,11 @@ describe("weather-forecast-card-animations", () => {
       };
 
       const provider = await fixture<WeatherAnimationProvider>(
-        html`<wfc-animation-provider
+        html`<pmc-animation-provider
           .hass=${hass}
           .config=${config}
           .weatherEntity=${entity}
-        ></wfc-animation-provider>`
+        ></pmc-animation-provider>`
       );
       await provider.updateComplete;
 
@@ -423,7 +423,7 @@ const queryAnimation = (
   selector: string
 ): Element | null => {
   const animationProvider = card.shadowRoot?.querySelector(
-    "wfc-animation-provider"
+    "pmc-animation-provider"
   );
   return animationProvider?.shadowRoot?.querySelector(selector) ?? null;
 };
@@ -433,7 +433,7 @@ const queryAnimationAll = (
   selector: string
 ): NodeListOf<Element> | never[] => {
   const animationProvider = card.shadowRoot?.querySelector(
-    "wfc-animation-provider"
+    "pmc-animation-provider"
   );
   return animationProvider?.shadowRoot?.querySelectorAll(selector) ?? [];
 };

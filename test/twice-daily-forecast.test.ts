@@ -73,7 +73,7 @@ describe("twice_daily forecast", () => {
       expect(forecastContainer).not.toBeNull();
 
       const forecastItems = forecastContainer?.querySelectorAll(
-        "wfc-forecast-simple"
+        "pmc-forecast-simple"
       );
       expect(forecastItems).not.toBeNull();
       expect(forecastItems?.length).toBeGreaterThan(0);
@@ -157,7 +157,7 @@ describe("twice_daily forecast", () => {
 
     it("should render chart container", async () => {
       const chartContainer =
-        card.shadowRoot?.querySelector("wfc-forecast-chart");
+        card.shadowRoot?.querySelector("pmc-forecast-chart");
       expect(chartContainer).not.toBeNull();
     });
 
@@ -165,7 +165,7 @@ describe("twice_daily forecast", () => {
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const chartComponent =
-        card.shadowRoot?.querySelector("wfc-forecast-chart");
+        card.shadowRoot?.querySelector("pmc-forecast-chart");
       expect(chartComponent).not.toBeNull();
 
       const canvas = chartComponent?.shadowRoot?.querySelector("canvas");

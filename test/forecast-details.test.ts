@@ -12,7 +12,7 @@ import {
 
 import "../src/components/wfc-forecast-details";
 
-describe("wfc-forecast-details", () => {
+describe("pmc-forecast-details", () => {
   const mockHassInstance = new MockHass();
   const hass = mockHassInstance.getHass() as ExtendedHomeAssistant;
 
@@ -34,12 +34,12 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
           .maxPrecipitation=${10}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const bar = element.querySelector(
@@ -60,12 +60,12 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
           .maxPrecipitation=${10}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const bar = element.querySelector(
@@ -86,12 +86,12 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
           .maxPrecipitation=${10}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const bar = element.querySelector(
@@ -113,12 +113,12 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
           .maxPrecipitation=${10}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const bar = element.querySelector(
@@ -140,11 +140,11 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const bar = element.querySelector(
@@ -168,12 +168,12 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
           .maxPrecipitation=${10}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const amount = element.querySelector(".wfc-forecast-precip-amount");
@@ -190,12 +190,12 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
           .maxPrecipitation=${10}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const container = element.querySelector(
@@ -214,12 +214,12 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
           .maxPrecipitation=${10}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const container = element.querySelector(
@@ -238,12 +238,12 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
           .maxPrecipitation=${10}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const container = element.querySelector(
@@ -266,11 +266,11 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const tempHigh = element.querySelector(".wfc-forecast-temperature-high");
@@ -288,11 +288,11 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const tempLow = element.querySelector(".wfc-forecast-temperature-low");
@@ -309,11 +309,11 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const tempLow = element.querySelector(".wfc-forecast-temperature-low");
@@ -330,11 +330,11 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const tempHigh = element.querySelector(".wfc-forecast-temperature-high");
@@ -348,10 +348,10 @@ describe("wfc-forecast-details", () => {
   describe("edge cases", () => {
     it("should return nothing when forecast is not provided", async () => {
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .config=${testConfig}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const container = element.querySelector(
@@ -369,12 +369,12 @@ describe("wfc-forecast-details", () => {
       };
 
       const element = await fixture<WfcForecastDetails>(
-        html`<wfc-forecast-details
+        html`<pmc-forecast-details
           .hass=${hass}
           .forecast=${forecast}
           .config=${testConfig}
           .maxPrecipitation=${10}
-        ></wfc-forecast-details>`
+        ></pmc-forecast-details>`
       );
 
       const bar = element.querySelector(

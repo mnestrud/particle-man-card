@@ -18,6 +18,8 @@ interface WeatherAlert {
   title?: string;
   event_type?: string;
   severity?: string;
+  /** Integration-computed rank, 0 = least severe (particle_man v1.7.0+). */
+  severity_rank?: number | null;
   area?: string;
   start_time?: string;
   expiration_time?: string;
@@ -26,26 +28,24 @@ interface WeatherAlert {
 }
 
 /**
- * Ordered worst-first; index doubles as the ranking for the banner color.
- * Maps onto HA theme variables the way the UV bands do — no hex literals.
+ * Numeric rank from the integration; unknown/absent ranks sort least-severe.
+ * No vocabulary lookup — the enum-string fallback exists only for pre-1.7.0
+ * integrations and treats every alert as minor rather than guessing.
  */
-const SEVERITY_RANK: Record<string, number> = {
-  EXTREME: 0,
-  SEVERE: 1,
-  MODERATE: 2,
-  MINOR: 3,
-};
+const rankOf = (alert: WeatherAlert): number =>
+  typeof alert.severity_rank === "number" ? alert.severity_rank : -1;
 
-const severityClass = (severity: string | undefined): string => {
-  switch ((severity ?? "").toUpperCase()) {
-    case "EXTREME":
-      return "wfc-alerts-extreme";
-    case "SEVERE":
-      return "wfc-alerts-severe";
-    case "MODERATE":
-      return "wfc-alerts-moderate";
+/** CSS class chosen by rank position, worst rank 3 → extreme. */
+const severityClass = (alert: WeatherAlert): string => {
+  switch (rankOf(alert)) {
+    case 3:
+      return "pmc-alerts-extreme";
+    case 2:
+      return "pmc-alerts-severe";
+    case 1:
+      return "pmc-alerts-moderate";
     default:
-      return "wfc-alerts-minor";
+      return "pmc-alerts-minor";
   }
 };
 
@@ -72,11 +72,7 @@ export class WfcAlerts extends LitElement {
     if (!Array.isArray(list)) {
       return [];
     }
-    return [...(list as WeatherAlert[])].sort(
-      (a, b) =>
-        (SEVERITY_RANK[(a.severity ?? "").toUpperCase()] ?? 9) -
-        (SEVERITY_RANK[(b.severity ?? "").toUpperCase()] ?? 9)
-    );
+    return [...(list as WeatherAlert[])].sort((a, b) => rankOf(b) - rankOf(a));
   }
 
   private formatTime(iso: string | undefined): string {
@@ -106,33 +102,41 @@ export class WfcAlerts extends LitElement {
       alerts.length === 1
         ? (worst.title ?? worst.event_type ?? "")
         : localize(this.hass, countKey, "{count}", String(alerts.length));
+    const worstUntil =
+      alerts.length === 1 ? this.formatTime(worst.expiration_time) : "";
 
     return html`
       <div
         class=${classMap({
-          "wfc-alerts": true,
-          [severityClass(worst.severity)]: true,
+          "pmc-alerts": true,
+          [severityClass(worst)]: true,
         })}
       >
         <button
-          class="wfc-alerts-banner"
+          class="pmc-alerts-banner"
           @click=${() => (this.expanded = !this.expanded)}
           aria-expanded=${this.expanded}
         >
-          <ha-icon icon="mdi:alert"></ha-icon>
-          <span class="wfc-alerts-banner-text">${banner}</span>
-          <span class="wfc-alerts-severity-label">
-            ${localize(
-              this.hass,
-              `alerts.severity.${(worst.severity ?? "MINOR").toUpperCase()}`
-            )}
-          </span>
+          ${worst.severity
+            ? html`<span class="pmc-chip">
+                ${localize(
+                  this.hass,
+                  `alerts.severity.${worst.severity.toUpperCase()}`
+                )}
+              </span>`
+            : nothing}
+          <span class="pmc-alerts-banner-text">${banner}</span>
+          ${worstUntil
+            ? html`<span class="pmc-alerts-banner-until">
+                ${localize(this.hass, "alerts.until")} ${worstUntil}
+              </span>`
+            : nothing}
           <ha-icon
             icon=${this.expanded ? "mdi:chevron-up" : "mdi:chevron-down"}
           ></ha-icon>
         </button>
         ${this.expanded
-          ? html`<div class="wfc-alerts-list">
+          ? html`<div class="pmc-alerts-list">
               ${alerts.map((alert) => this.renderAlert(alert))}
             </div>`
           : nothing}
@@ -144,30 +148,30 @@ export class WfcAlerts extends LitElement {
     const until = this.formatTime(alert.expiration_time);
     return html`
       <div class=${classMap({
-        "wfc-alerts-item": true,
-        [severityClass(alert.severity)]: true,
+        "pmc-alerts-item": true,
+        [severityClass(alert)]: true,
       })}>
-        <div class="wfc-alerts-item-header">
-          <span class="wfc-alerts-item-title">
+        <div class="pmc-alerts-item-header">
+          <span class="pmc-alerts-item-title">
             ${alert.title ?? alert.event_type ?? ""}
           </span>
           ${until
-            ? html`<span class="wfc-alerts-item-until">
+            ? html`<span class="pmc-alerts-item-until">
                 ${localize(this.hass, "alerts.until")} ${until}
               </span>`
             : nothing}
         </div>
         ${alert.area
-          ? html`<div class="wfc-alerts-item-area">${alert.area}</div>`
+          ? html`<div class="pmc-alerts-item-area">${alert.area}</div>`
           : nothing}
         ${alert.description
-          ? html`<div class="wfc-alerts-item-description">
+          ? html`<div class="pmc-alerts-item-description">
               ${alert.description}
             </div>`
           : nothing}
         ${alert.instruction
-          ? html`<div class="wfc-alerts-item-instruction">
-              <span class="wfc-alerts-item-instruction-label">
+          ? html`<div class="pmc-alerts-item-instruction">
+              <span class="pmc-alerts-item-instruction-label">
                 ${localize(this.hass, "alerts.instructions")}:
               </span>
               ${alert.instruction}
