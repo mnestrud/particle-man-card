@@ -234,11 +234,23 @@ export class WfcNowcast extends LitElement {
         plugins: {
           tooltip: { enabled: false },
           legend: { display: false },
-          // The forecast chart registers chartjs-plugin-datalabels GLOBALLY;
-          // without an explicit opt-out it labels every bar with the raw
-          // {x, y} point object. Latent since the fork — the strip first
-          // rendered real bars on the first rainy day.
-          datalabels: { display: false },
+          // chartjs-plugin-datalabels is registered globally by the forecast
+          // chart. Configured here deliberately (never left on defaults —
+          // those render the raw {x,y} objects): each segment shows its
+          // precipitation probability under the bar, sitting between the
+          // baseline and the time ticks.
+          datalabels: {
+            display: (ctx) =>
+              typeof this.entries[ctx.dataIndex]?.probability === "number",
+            formatter: (_value, ctx) =>
+              String(this.entries[ctx.dataIndex]?.probability ?? ""),
+            anchor: "start",
+            align: "bottom",
+            offset: 0,
+            clip: false,
+            color: labelColor || undefined,
+            font: { size: 9 },
+          },
         },
         scales: {
           x: {
@@ -248,6 +260,7 @@ export class WfcNowcast extends LitElement {
             grid: { display: false },
             ticks: {
               stepSize: stepMinutes,
+              padding: 14,
               color: labelColor || undefined,
               font: { size: fontSize },
               callback: (value) => {
