@@ -24,6 +24,11 @@ import {
   WeatherForecastCardForecastActionConfig,
   WeatherForecastCardForecastConfig,
 } from "../types";
+import type {
+  AlertsConfig,
+  DiscoveredPanelConfig,
+  NowcastConfig,
+} from "../types";
 
 // Device class mapping for attribute entity selectors
 const ATTRIBUTE_DEVICE_CLASS_MAP: Record<
@@ -43,7 +48,7 @@ const ATTRIBUTE_DEVICE_CLASS_MAP: Record<
 };
 
 type HaFormSelector =
-  | { entity: { domain?: string; device_class?: string | string[] } }
+  | { entity: { domain?: string | string[]; device_class?: string | string[] } }
   | { boolean: {} }
   | { text: {} }
   | { icon: {} }
@@ -68,7 +73,12 @@ type HaFormSchema = {
     | `current.attribute_entity_${CurrentWeatherAttributes}`
     | `current.attribute_label_${CurrentWeatherAttributes}`
     | `current.attribute_icon_${CurrentWeatherAttributes}`
+    | `nowcast.${keyof NowcastConfig | "enabled"}`
+    | `alerts.${keyof AlertsConfig}`
+    | `air_quality.${keyof DiscoveredPanelConfig}`
+    | `pollen.${keyof DiscoveredPanelConfig}`
     | "attribute_entities"
+    | "particle_man_panels"
     | "";
   type?: string;
   iconPath?: TemplateResult;
@@ -144,6 +154,7 @@ export class WeatherForecastCardEditor
         ...this._forecastSchema(localize),
         ...this._interactionsSchema(mode),
         ...this._attributeEntitiesSchema(selectedAttributes),
+        ...this._panelsSchema(),
         ...this._advancedSchema(),
       ] as const
   );
@@ -535,6 +546,35 @@ export class WeatherForecastCardEditor
     ];
   };
 
+  private _panelsSchema = (): HaFormSchema[] =>
+    [
+      {
+        name: "particle_man_panels",
+        type: "expandable",
+        flatten: true,
+        schema: [
+          { name: "nowcast.enabled", selector: { boolean: {} } },
+          {
+            name: "nowcast.entity",
+            selector: { entity: { domain: ["weather", "sensor"] } },
+          },
+          { name: "nowcast.always_show", selector: { boolean: {} } },
+          {
+            name: "alerts.entity",
+            selector: { entity: { domain: "sensor" } },
+          },
+          {
+            name: "air_quality.anchor_entity",
+            selector: { entity: { domain: "sensor" } },
+          },
+          {
+            name: "pollen.anchor_entity",
+            selector: { entity: { domain: "sensor" } },
+          },
+        ],
+      },
+    ] as const;
+
   private _advancedSchema = (): HaFormSchema[] =>
     [
       {
@@ -552,6 +592,10 @@ export class WeatherForecastCardEditor
                   {
                     value: "both",
                     label: "Hourly and daily",
+                  },
+                  {
+                    value: "all",
+                    label: "Hourly, daily and twice-daily",
                   },
                   {
                     value: "daily",
@@ -755,7 +799,33 @@ export class WeatherForecastCardEditor
     return [];
   }
 
+  private static readonly PANEL_LABELS: Record<string, string> = {
+    particle_man_panels: "Nowcast, alerts, air quality & pollen",
+    "nowcast.enabled": "Show precipitation nowcast",
+    "nowcast.entity": "Nowcast source (defaults to the card entity)",
+    "nowcast.always_show": "Show nowcast even when dry",
+    "alerts.entity": "Weather alert count sensor",
+    "air_quality.anchor_entity": "Air quality sensor (any on the device)",
+    "pollen.anchor_entity": "Pollen sensor (any on the device)",
+  };
+
+  private static readonly PANEL_HELPERS: Record<string, string> = {
+    "nowcast.entity":
+      "A weather entity whose integration provides get_minute_forecast, or a sensor exposing nowcast segments as an attribute.",
+    "alerts.entity":
+      "The alert-count sensor whose `alerts` attribute carries the active alerts (e.g. Particle Man's Alert Count).",
+    "air_quality.anchor_entity":
+      "Pick any sensor from the air-quality device; its siblings are discovered automatically.",
+    "pollen.anchor_entity":
+      "Pick any sensor from the pollen device; its siblings are discovered automatically.",
+  };
+
   private _computeLabel = (schema: HaFormSchema): string | undefined => {
+    const panelLabel = WeatherForecastCardEditor.PANEL_LABELS[schema.name];
+    if (panelLabel) {
+      return panelLabel;
+    }
+
     if (schema.name.startsWith("current.attribute_label_")) {
       const attribute = schema.name.replace("current.attribute_label_", "");
       const attributeLabel =
@@ -885,6 +955,11 @@ export class WeatherForecastCardEditor
   };
 
   private _computeHelper = (schema: HaFormSchema): string | undefined => {
+    const panelHelper = WeatherForecastCardEditor.PANEL_HELPERS[schema.name];
+    if (panelHelper) {
+      return panelHelper;
+    }
+
     switch (schema.name) {
       case "current.temperature_entity":
         return "Optional temperature sensor entity to override the weather entity's temperature.";
@@ -959,6 +1034,29 @@ export class WeatherForecastCardEditor
 
     // Remove legacy root-level temperature_entity (now under current.temperature_entity)
     delete newConfig.temperature_entity;
+
+    // A panel group with no meaningful values must disappear from the config —
+    // an anchor-less air_quality/pollen block would sit at "finding sensors"
+    // forever, and an entity-less alerts block is dead weight.
+    if (newConfig.nowcast) {
+      // `enabled` exists only in the form: an empty nowcast object is valid
+      // config (strip defaults to the card's weather entity), so a plain
+      // "turn it on" toggle is needed to distinguish on-with-defaults from off.
+      const nowcastEnabled = newConfig.nowcast.enabled === true;
+      delete newConfig.nowcast.enabled;
+      if (!nowcastEnabled) {
+        delete newConfig.nowcast;
+      }
+    }
+    if (newConfig.alerts && !newConfig.alerts.entity) {
+      delete newConfig.alerts;
+    }
+    if (newConfig.air_quality && !newConfig.air_quality.anchor_entity) {
+      delete newConfig.air_quality;
+    }
+    if (newConfig.pollen && !newConfig.pollen.anchor_entity) {
+      delete newConfig.pollen;
+    }
 
     if (newConfig?.forecast?.extra_attribute === "none") {
       delete newConfig.forecast.extra_attribute;
@@ -1205,7 +1303,11 @@ const moveDottedKeysToNested = (obj: Record<string, any>) => {
     if (
       !key.startsWith("forecast.") &&
       !key.startsWith("forecast_action.") &&
-      !key.startsWith("current.")
+      !key.startsWith("current.") &&
+      !key.startsWith("nowcast.") &&
+      !key.startsWith("alerts.") &&
+      !key.startsWith("air_quality.") &&
+      !key.startsWith("pollen.")
     )
       continue;
 
@@ -1245,6 +1347,10 @@ export const denormalizeConfig = (obj: Record<string, any>) => {
 
   if (result.show_condition_effects === true) {
     result.show_condition_effects = [...WEATHER_EFFECTS];
+  }
+
+  if (obj.nowcast) {
+    result["nowcast.enabled"] = true;
   }
 
   if (result["current.show_attributes"] === true) {
@@ -1315,6 +1421,21 @@ const flattenNestedKeys = (obj: Record<string, any>) => {
     ) {
       for (const innerKey in value) {
         result[`current.${innerKey}`] = value[innerKey];
+      }
+      continue;
+    }
+
+    if (
+      (key === "nowcast" ||
+        key === "alerts" ||
+        key === "air_quality" ||
+        key === "pollen") &&
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value)
+    ) {
+      for (const innerKey in value) {
+        result[`${key}.${innerKey}`] = value[innerKey];
       }
       continue;
     }
