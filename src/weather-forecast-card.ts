@@ -93,6 +93,7 @@ export class WeatherForecastCard extends LitElement {
   @state() private config?: WeatherForecastCardConfig;
   @state() private _dailyForecastEvent?: ForecastEvent | undefined;
   @state() private _hourlyForecastEvent?: ForecastEvent | undefined;
+  @state() private _twiceDailyForecastEvent?: ForecastEvent | undefined;
   @state() private _currentItemWidth!: number;
   @state() private _currentForecastType: ForecastType = "daily";
   @state() private _isScrollable = false;
@@ -111,6 +112,7 @@ export class WeatherForecastCard extends LitElement {
 
   private _dailySubscription?: ForecastSubscription;
   private _hourlySubscription?: ForecastSubscription;
+  private _twiceDailySubscription?: ForecastSubscription;
   private _subscriptionRequestId = 0;
   private _subscriptionGeneration = 0;
   private _subscribed = false;
@@ -118,6 +120,8 @@ export class WeatherForecastCard extends LitElement {
 
   private _hourlyForecastData?: ForecastAttribute[];
   private _dailyForecastData?: ForecastAttribute[];
+  /** Populated only when twice_daily runs as a third view ("all" mode). */
+  private _twiceDailyForecastData?: ForecastAttribute[];
 
   private _minForecastItemWidth?: number;
   private _resizeObserver?: ResizeObserver | null = null;
@@ -377,6 +381,7 @@ export class WeatherForecastCard extends LitElement {
       changedProperties.has("_discovery") ||
       changedProperties.has("_dailyForecastEvent") ||
       changedProperties.has("_hourlyForecastEvent") ||
+      changedProperties.has("_twiceDailyForecastEvent") ||
       changedProperties.has("_currentForecastType") ||
       changedProperties.has("_currentItemWidth") ||
       changedProperties.has("_isScrollable")
@@ -429,8 +434,12 @@ export class WeatherForecastCard extends LitElement {
       </hui-warning>`;
     }
 
+    // Renderers need day/night pairing whenever the *visible* view is
+    // twice_daily — whether that is the entity's only daily-like type or the
+    // separately subscribed third view.
     const isTwiceDailyEntity =
-      getDailyForecastType(stateObject) === "twice_daily";
+      getDailyForecastType(stateObject) === "twice_daily" ||
+      this._currentForecastType === "twice_daily";
     const isChartMode = this.config.forecast?.mode === ForecastMode.Chart;
     const currentForecast = this.getCurrentForecast();
 
@@ -592,9 +601,17 @@ export class WeatherForecastCard extends LitElement {
       this._dailyForecastEvent,
       getDailyForecastType(weatherEntity)
     );
+    const twiceDailyForecastData = getForecast(
+      attributes,
+      this._twiceDailyForecastEvent,
+      "twice_daily"
+    );
 
-    if (!hourlyForecastData && !dailyForecastData) {
+    if (!hourlyForecastData && !dailyForecastData && !twiceDailyForecastData) {
       return;
+    }
+    if (twiceDailyForecastData) {
+      this._twiceDailyForecastData = twiceDailyForecastData.forecast;
     }
 
     this._dailyForecastData = dailyForecastData?.forecast;
@@ -677,30 +694,41 @@ export class WeatherForecastCard extends LitElement {
     }
   }
 
+  private availableForecastViews(): ForecastType[] {
+    const weatherEntity = this.hass?.states[this.config!.entity];
+    const effectiveDailyType = getDailyForecastType(weatherEntity) || "daily";
+    const views: ForecastType[] = [];
+    if (this._dailyForecastData?.length) {
+      views.push(effectiveDailyType);
+    }
+    if (this._hourlyForecastData?.length) {
+      views.push("hourly");
+    }
+    // Third view only when separately subscribed — otherwise twice_daily is
+    // already the daily slot and adding it would duplicate a view.
+    if (this._twiceDailyForecastData?.length) {
+      views.push("twice_daily");
+    }
+    return views;
+  }
+
   private _toggleForecastView(selectedForecast?: ForecastAttribute) {
     const isInDailyLikeView =
       this._currentForecastType === "daily" ||
       this._currentForecastType === "twice_daily";
     const willSwitchToHourly = isInDailyLikeView;
-    const targetForecastData = willSwitchToHourly
-      ? this._hourlyForecastData
-      : this._dailyForecastData;
 
-    // Toggle between hourly and the effective daily type (daily or twice_daily)
-    const weatherEntity = this.hass?.states[this.config!.entity];
-    const effectiveDailyType = getDailyForecastType(weatherEntity) || "daily";
-
-    // Don't toggle if the target forecast type has no data
-    if (!targetForecastData || targetForecastData.length === 0) {
-      logger.debug(
-        `Cannot toggle to ${willSwitchToHourly ? "hourly" : effectiveDailyType} forecast - no data available`
-      );
+    // Cycle through every view that has data. With the classic two views this
+    // degrades to exactly the old daily<->hourly toggle.
+    const views = this.availableForecastViews();
+    if (views.length < 2) {
+      logger.debug("Only one forecast view has data - nothing to toggle");
       return;
     }
+    const currentIndex = views.indexOf(this._currentForecastType);
+    const nextView = views[(currentIndex + 1) % views.length]!;
 
-    this._currentForecastType = isInDailyLikeView
-      ? "hourly"
-      : effectiveDailyType;
+    this._currentForecastType = nextView;
 
     if (!selectedForecast || !this.config?.forecast?.scroll_to_selected) {
       return;
@@ -754,6 +782,7 @@ export class WeatherForecastCard extends LitElement {
 
     const dailySubscription = this._dailySubscription;
     const hourlySubscription = this._hourlySubscription;
+    const twiceDailySubscription = this._twiceDailySubscription;
 
     this._subscribed = false;
 
@@ -761,6 +790,7 @@ export class WeatherForecastCard extends LitElement {
     // accidentally unsubscribe handles already being retired by this generation.
     this._dailySubscription = undefined;
     this._hourlySubscription = undefined;
+    this._twiceDailySubscription = undefined;
 
     // Once we have fully torn down while detached, stop listening for visibility
     // changes so a discarded card is not retained by the document-level listener.
@@ -775,6 +805,7 @@ export class WeatherForecastCard extends LitElement {
     await Promise.all([
       this.unsubscribeForecastSubscription(dailySubscription, "daily"),
       this.unsubscribeForecastSubscription(hourlySubscription, "hourly"),
+      this.unsubscribeForecastSubscription(twiceDailySubscription, "twice_daily"),
     ]);
   }
 
@@ -953,6 +984,29 @@ export class WeatherForecastCard extends LitElement {
       );
     }
 
+    // A separate twice_daily subscription only makes sense when daily won the
+    // daily slot — otherwise the slot already carries twice_daily data.
+    if (
+      forecastTypes === "all" &&
+      effectiveDailyType === "daily" &&
+      supportsForecastType(weatherEntity, "twice_daily")
+    ) {
+      this._twiceDailySubscription = this.createForecastSubscription(
+        "twice_daily",
+        (event) => {
+          if (!this.shouldHandleForecastEvent(subscriptionGeneration)) {
+            return;
+          }
+
+          this._twiceDailyForecastEvent = event;
+          this.processForecastData();
+        },
+        () => {
+          this._twiceDailyForecastEvent = undefined;
+        }
+      );
+    }
+
     if (subscribeHourly && supportsForecastType(weatherEntity, "hourly")) {
       this._hourlySubscription = this.createForecastSubscription(
         "hourly",
@@ -972,11 +1026,15 @@ export class WeatherForecastCard extends LitElement {
   }
 
   private getCurrentForecast(): ForecastAttribute[] {
-    return (
-      (this._currentForecastType === "hourly"
-        ? this._hourlyForecastData
-        : this._dailyForecastData) || []
-    );
+    if (this._currentForecastType === "hourly") {
+      return this._hourlyForecastData || [];
+    }
+    if (this._currentForecastType === "twice_daily") {
+      // Third-view data when subscribed separately; otherwise the daily slot
+      // already carries twice_daily (the fallback for entities without daily).
+      return this._twiceDailyForecastData || this._dailyForecastData || [];
+    }
+    return this._dailyForecastData || [];
   }
 
   private layoutForecastItems(containerWidth: number) {

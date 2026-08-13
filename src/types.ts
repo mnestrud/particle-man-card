@@ -13,7 +13,12 @@ export type ForecastSubscription =
   | Promise<ForecastUnsubscribe | undefined>
   | undefined;
 
-export type ForecastTypesOption = "both" | "daily" | "hourly";
+/**
+ * Which forecast subscriptions to open. "both" keeps its historical meaning of
+ * daily + hourly; "all" additionally subscribes twice_daily as a third view
+ * when the entity supports it alongside daily.
+ */
+export type ForecastTypesOption = "both" | "daily" | "hourly" | "all";
 
 export type ForecastActionDetails = ActionHandlerDetail & {
   selectedForecast: ForecastAttribute;
@@ -165,7 +170,7 @@ export interface WeatherForecastCardConfig {
   temperature_entity?: string;
   show_current?: boolean;
   show_forecast?: boolean;
-  default_forecast?: "hourly" | "daily";
+  default_forecast?: "hourly" | "daily" | "twice_daily";
   forecast_types?: ForecastTypesOption;
   icons_path?: string;
   show_condition_effects?: boolean | WeatherEffect[];
