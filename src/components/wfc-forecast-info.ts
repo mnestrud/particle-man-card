@@ -62,6 +62,15 @@ export class WfcForecastInfo extends LitElement {
           >${String(rounded)}</span
         >
       `;
+    } else if (attribute === "solar_wh") {
+      const wh = this.forecast.solar_wh;
+      if (wh == null) {
+        return null;
+      }
+      const display = wh >= 1000 ? `${(wh / 1000).toFixed(1)}kWh` : `${wh}Wh`;
+      return html`
+        <span class="wfc-forecast-extra-solar wfc-secondary">${display}</span>
+      `;
     } else if (attribute === "wind_bearing" || attribute === "wind_direction") {
       return html`<wfc-wind-indicator
         .hass=${this.hass}

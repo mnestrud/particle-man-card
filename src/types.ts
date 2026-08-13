@@ -134,6 +134,12 @@ export interface WeatherForecastCardForecastActionConfig {
   double_tap_action?: ForecastActionConfig;
 }
 
+/** Solar production forecast merged into forecast entries (Energy dashboard). */
+export interface SolarConfig {
+  /** Config entry ids to include; defaults to every solar_forecast source. */
+  config_entries?: string[];
+}
+
 /** Severity-colored weather-alert banner with expandable detail. */
 export interface AlertsConfig {
   /** Alert-count sensor whose `alerts` attribute holds the alert list. */
@@ -164,6 +170,7 @@ export interface WeatherForecastCardConfig {
   pollen?: DiscoveredPanelConfig;
   nowcast?: NowcastConfig;
   alerts?: AlertsConfig;
+  solar?: SolarConfig;
   entity: string;
   name?: string;
   /** @deprecated Use `current.temperature_entity` instead */

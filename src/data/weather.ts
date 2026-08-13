@@ -44,6 +44,8 @@ export interface ForecastAttribute {
   wind_bearing?: number | string;
   uv_index?: number;
   apparent_temperature?: number;
+  /** Solar production for the entry's hour/day in Wh (Energy dashboard). */
+  solar_wh?: number;
 }
 
 export interface WeatherEntityAttributes extends HassEntityAttributeBase {

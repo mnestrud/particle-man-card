@@ -66,6 +66,7 @@ import "./components/wfc-nowcast";
 import "./components/wfc-alerts";
 import "./components/wfc-air-quality";
 import "./components/wfc-pollen";
+import { SolarLookup, fetchSolarForecast, mergeSolarForecast } from "./data/solar";
 
 const DEFAULT_CONFIG: Partial<WeatherForecastCardConfig> = {
   type: "custom:particle-man-card",
@@ -107,6 +108,8 @@ export class WeatherForecastCard extends LitElement {
    */
   private watchSet = new EntityWatchSet();
   private discoveryStarted = new Set<string>();
+  private _solarLookup: SolarLookup | null = null;
+  private _solarFetched = false;
   @query("ha-card") private _haCard?: HTMLElement;
   @query(".wfc-forecast-container") private _forecastContainer?: HTMLElement;
 
@@ -216,6 +219,8 @@ export class WeatherForecastCard extends LitElement {
     this.watchSet.setStatic(staticIds);
     this.discoveryStarted = new Set();
     this._discovery = {};
+    this._solarFetched = false;
+    this._solarLookup = null;
   }
 
   /**
@@ -234,6 +239,22 @@ export class WeatherForecastCard extends LitElement {
       anchors.pollen = pollen;
     }
     return anchors;
+  }
+
+  private maybeFetchSolar(): void {
+    if (!this.config?.solar || !this.hass || this._solarFetched) {
+      return;
+    }
+    this._solarFetched = true;
+    void fetchSolarForecast(this.hass, this.config.solar.config_entries).then(
+      (lookup) => {
+        this._solarLookup = lookup;
+        if (lookup) {
+          // Re-annotate whatever forecasts already arrived.
+          this.processForecastData();
+        }
+      }
+    );
   }
 
   private maybeStartDiscovery(): void {
@@ -404,6 +425,7 @@ export class WeatherForecastCard extends LitElement {
     }
 
     this.maybeStartDiscovery();
+    this.maybeFetchSolar();
 
     // Skip while the page is hidden: a hass update arriving in a backgrounded
     // tab must not re-open subscriptions we deliberately suspended.
@@ -642,6 +664,31 @@ export class WeatherForecastCard extends LitElement {
         0,
         this.config.forecast.hourly_slots
       );
+    }
+
+    // Annotate with solar production once the Energy lookup has arrived.
+    if (this._solarLookup) {
+      if (this._hourlyForecastData) {
+        this._hourlyForecastData = mergeSolarForecast(
+          this._hourlyForecastData,
+          this._solarLookup,
+          "hourly"
+        );
+      }
+      if (this._dailyForecastData) {
+        this._dailyForecastData = mergeSolarForecast(
+          this._dailyForecastData,
+          this._solarLookup,
+          "daily"
+        );
+      }
+      if (this._twiceDailyForecastData) {
+        this._twiceDailyForecastData = mergeSolarForecast(
+          this._twiceDailyForecastData,
+          this._solarLookup,
+          "daily"
+        );
+      }
     }
 
     // Auto-switch to available forecast type if current type has no data
