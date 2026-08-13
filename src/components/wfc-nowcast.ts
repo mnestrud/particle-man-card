@@ -231,7 +231,15 @@ export class WfcNowcast extends LitElement {
         maintainAspectRatio: false,
         animation: false,
         events: [],
-        plugins: { tooltip: { enabled: false }, legend: { display: false } },
+        plugins: {
+          tooltip: { enabled: false },
+          legend: { display: false },
+          // The forecast chart registers chartjs-plugin-datalabels GLOBALLY;
+          // without an explicit opt-out it labels every bar with the raw
+          // {x, y} point object. Latent since the fork — the strip first
+          // rendered real bars on the first rainy day.
+          datalabels: { display: false },
+        },
         scales: {
           x: {
             type: "linear",
