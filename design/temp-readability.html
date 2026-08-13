@@ -23,6 +23,20 @@
     background: var(--primary-color); transform: translate(-50%, -50%);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 25%, transparent);
   }
+  /* Mocked hover/tap tooltip (Phase 2 adds the Chart.js Tooltip plugin) */
+  .tip-line {
+    position: absolute; width: 0; top: 10%; bottom: 24%;
+    border-left: 1px solid color-mix(in srgb, var(--secondary-text-color) 45%, transparent);
+  }
+  .tip-bubble {
+    position: absolute; transform: translate(-50%, -150%);
+    background: var(--card-background-color);
+    border: 1px solid var(--divider-color); border-radius: 6px;
+    padding: 3px 8px; font: 550 10px var(--pmc-font);
+    color: var(--primary-text-color); white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    font-variant-numeric: tabular-nums;
+  }
   /* Variant C: dashed reference lines at the hi/lo levels, labels on the right */
   .gridline {
     position: absolute; left: 0; right: 34px;
@@ -49,7 +63,9 @@
 <template id="stage-template">
   <div class="variant-label">1 · Hi/Lo on the line (baseline, recommended)
     <small>Day's high and low labeled at their points, "now" dot with current
-    temp at the left edge. Minimal ink; already applied to the composites.</small>
+    temp at the left edge. Minimal ink; already applied to the composites.
+    Shown mid-hover: tap/hover anywhere gives time + temp ("12 AM · 83°") —
+    a Phase 2 addition, upstream's chart has no tooltips at all.</small>
   </div>
   <div class="ha-card"><div class="pmc-panel">
     <div class="chartwrap" data-mode="baseline"></div>
@@ -133,6 +149,21 @@
     place("now-dot", 0);
     place("templabel now", 0, `${temps[0]}°`);
 
+    if (mode === "baseline") {
+      // Mock the hover state at hour index 9 (12 AM, 83°)
+      const i = 9;
+      const leftPct = `${(i / (temps.length - 1)) * 100}%`;
+      const line = document.createElement("div");
+      line.className = "tip-line";
+      line.style.left = leftPct;
+      wrap.append(line);
+      const bubble = document.createElement("div");
+      bubble.className = "tip-bubble";
+      bubble.style.left = leftPct;
+      bubble.style.top = `${(yOf(temps[i]) / 84) * 100}%`;
+      bubble.textContent = `12 AM · ${temps[i]}°`;
+      wrap.append(bubble);
+    }
     if (mode === "inline") {
       for (const i of [6, 18]) place("templabel inline", i, `${temps[i]}°`);
     }
