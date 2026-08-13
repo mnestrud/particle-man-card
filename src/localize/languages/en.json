@@ -59,5 +59,12 @@
     "title": "Forecast",
     "hourly": "Hourly",
     "daily": "Daily"
+  },
+  "uv": {
+    "low": "Low",
+    "moderate": "Moderate",
+    "high": "High",
+    "very_high": "Very High",
+    "extreme": "Extreme"
   }
 }

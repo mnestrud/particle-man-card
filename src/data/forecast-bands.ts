@@ -2,6 +2,7 @@ import { HomeAssistant } from "custom-card-helpers";
 import { DiscoveryResult } from "./entity-discovery";
 import { classifyAirQuality, classifyPollen } from "./panel-entities";
 import { localize } from "../localize/localize";
+import { getUvIndexBandKey, getUvIndexColor } from "./uv-index";
 import { ForecastAttribute } from "./weather";
 
 /**
@@ -196,9 +197,35 @@ export const buildForecastBands = (
           label: `${slotTime(hass, slot.datetime, granularity)} — ${breakdown}`,
         };
       });
-      if (cells.some((cell) => cell.color)) {
+      // The whole strip disappears on all-quiet stretches (user decision
+      // 2026-08-13); it returns the day any type reaches the action level.
+      const anyActing = [...byDay.values()].some((list) =>
+        list.some((t) => t.belowActionLevel === false)
+      );
+      if (anyActing && cells.some((cell) => cell.color)) {
         rows.push({ key: "pollen", cells });
       }
+    }
+  }
+
+  // UV/sun-risk band, last row: WHO ladder colors via the card's existing
+  // uv-index module — same bands upstream's chart mode has always used. Reads
+  // uv_index straight off the forecast slots; UV 0 (night, overcast winter
+  // days) stays unpainted so the row carries ink only where risk exists.
+  {
+    const cells: BandCell[] = slots.map((slot) => {
+      const uv = slot.uv_index;
+      if (typeof uv !== "number" || Math.round(uv) < 1) {
+        return { color: null, label: null };
+      }
+      const band = localize(hass, `uv.${getUvIndexBandKey(uv)}`);
+      return {
+        color: `var(${getUvIndexColor(uv)})`,
+        label: `${slotTime(hass, slot.datetime, granularity)} — UV ${Math.round(uv)} · ${band}`,
+      };
+    });
+    if (cells.some((cell) => cell.color)) {
+      rows.push({ key: "uv", cells });
     }
   }
 

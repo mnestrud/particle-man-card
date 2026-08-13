@@ -23,3 +23,24 @@ export function getUvIndexColor(value: number | null): string {
   }
   return "--wfc-uv-low";
 }
+
+/**
+ * WHO band key for localize lookups (`uv.<key>`), same rounding and
+ * boundaries as {@link getUvIndexColor} so label and color never disagree.
+ */
+export function getUvIndexBandKey(value: number): string {
+  const index = Math.round(value);
+  if (index >= 11) {
+    return "extreme";
+  }
+  if (index >= 8) {
+    return "very_high";
+  }
+  if (index >= 6) {
+    return "high";
+  }
+  if (index >= 3) {
+    return "moderate";
+  }
+  return "low";
+}

@@ -98,6 +98,13 @@ const CHART_LABEL_VERTICAL_PADDING = 10;
 // Default chart height in pixels at the baseline font size, used as a reference for scaling the chart height dynamically.
 const DEFAULT_CHART_HEIGHT = 130;
 
+// Identity badge per harmonized band row.
+const BAND_ICONS: Record<string, string> = {
+  air_quality: "mdi:factory",
+  pollen: "mdi:flower-pollen",
+  uv: "mdi:sun-wireless",
+};
+
 /**
  * A chart component to display weather forecast data.
  *
@@ -300,11 +307,7 @@ export class WfcForecastChart extends LitElement {
               (row) => html`
                 <div class="pmc-chart-band-row">
                   <div class="pmc-band-icon">
-                    <ha-icon
-                      .icon=${row.key === "pollen"
-                        ? "mdi:flower-pollen"
-                        : "mdi:factory"}
-                    ></ha-icon>
+                    <ha-icon .icon=${BAND_ICONS[row.key] ?? "mdi:factory"}></ha-icon>
                   </div>
                   ${row.cells.map(
                     (cell) => html`
