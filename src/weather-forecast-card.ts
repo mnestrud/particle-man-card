@@ -64,6 +64,8 @@ import "./components/wfc-current-weather";
 import "./components/animation/wfc-animation-provider";
 import "./components/wfc-nowcast";
 import "./components/wfc-alerts";
+import "./components/wfc-air-quality";
+import "./components/wfc-pollen";
 
 const DEFAULT_CONFIG: Partial<WeatherForecastCardConfig> = {
   type: "custom:particle-man-card",
@@ -502,6 +504,18 @@ export class WeatherForecastCard extends LitElement {
                       .isScrollable=${this._isScrollable}
                     ></wfc-forecast-simple>`}
               </div>`}
+          ${this.config.air_quality
+            ? html`<wfc-air-quality
+                .hass=${this.hass}
+                .discovery=${this._discovery.air_quality}
+              ></wfc-air-quality>`
+            : nothing}
+          ${this.config.pollen
+            ? html`<wfc-pollen
+                .hass=${this.hass}
+                .discovery=${this._discovery.pollen}
+              ></wfc-pollen>`
+            : nothing}
         </div>
       </ha-card>
     `;

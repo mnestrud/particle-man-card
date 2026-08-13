@@ -794,3 +794,190 @@ wfc-weather-condition-icon-provider {
 .wfc-alerts-item-instruction-label {
   font-weight: 600;
 }
+
+/* --- Shared panel chrome (wfc-air-quality, wfc-pollen) -------------------- */
+
+.wfc-panel {
+  margin-top: var(--ha-space-3, 12px);
+  padding-top: var(--ha-space-2, 8px);
+  border-top: 1px solid var(--divider-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ha-space-2, 8px);
+}
+
+.wfc-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--ha-space-2, 8px);
+}
+
+.wfc-panel-title {
+  font-size: var(--ha-font-size-s, 12px);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--secondary-text-color);
+}
+
+.wfc-panel-headline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ha-space-1, 4px);
+  font-weight: 500;
+}
+
+.wfc-panel-empty {
+  font-size: var(--ha-font-size-s, 12px);
+  color: var(--secondary-text-color);
+}
+
+.wfc-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* --- Air quality ---------------------------------------------------------- */
+
+.wfc-aq-advisory,
+.wfc-aq-dominant {
+  font-size: var(--ha-font-size-s, 12px);
+  color: var(--secondary-text-color);
+}
+
+.wfc-aq-pollutants {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--ha-space-1, 4px) var(--ha-space-3, 12px);
+}
+
+.wfc-aq-pollutant {
+  display: flex;
+  align-items: center;
+  gap: var(--ha-space-1, 4px);
+  font-size: var(--ha-font-size-s, 12px);
+}
+
+.wfc-aq-pollutant-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wfc-aq-pollutant-value {
+  color: var(--secondary-text-color);
+}
+
+.wfc-aq-health-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--ha-space-1, 4px);
+  align-self: flex-start;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--primary-color);
+  font: inherit;
+  font-size: var(--ha-font-size-s, 12px);
+  cursor: pointer;
+}
+
+.wfc-aq-health {
+  font-size: var(--ha-font-size-s, 12px);
+  white-space: pre-line;
+}
+
+/* --- Pollen ---------------------------------------------------------------- */
+
+.wfc-pollen-types {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--ha-space-2, 8px);
+}
+
+.wfc-pollen-tile {
+  display: flex;
+  align-items: center;
+  gap: var(--ha-space-2, 8px);
+}
+
+.wfc-pollen-tile-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.wfc-pollen-tile-name {
+  font-size: var(--ha-font-size-s, 12px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wfc-pollen-tile-value {
+  font-size: var(--ha-font-size-s, 12px);
+  color: var(--secondary-text-color);
+}
+
+.wfc-pollen-plants {
+  display: flex;
+  flex-direction: column;
+}
+
+.wfc-pollen-plant-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ha-space-2, 8px);
+  width: 100%;
+  padding: var(--ha-space-1, 4px) 0;
+  border: none;
+  background: none;
+  color: var(--primary-text-color);
+  font: inherit;
+  font-size: var(--ha-font-size-s, 12px);
+  cursor: pointer;
+  text-align: left;
+}
+
+.wfc-pollen-plant-name {
+  flex: 1;
+}
+
+.wfc-pollen-plant-value {
+  color: var(--secondary-text-color);
+}
+
+.wfc-pollen-plant-detail {
+  display: flex;
+  gap: var(--ha-space-3, 12px);
+  padding: var(--ha-space-1, 4px) 0 var(--ha-space-2, 8px) 18px;
+  font-size: var(--ha-font-size-s, 12px);
+}
+
+.wfc-pollen-plant-picture {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: var(--ha-border-radius-lg, 12px);
+  flex-shrink: 0;
+}
+
+.wfc-pollen-plant-detail dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px var(--ha-space-2, 8px);
+}
+
+.wfc-pollen-plant-detail dt {
+  color: var(--secondary-text-color);
+}
+
+.wfc-pollen-plant-detail dd {
+  margin: 0;
+}
