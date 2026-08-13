@@ -123,29 +123,17 @@ export class WfcNowcast extends LitElement {
         String(hours)
       );
     }
-    const chance =
-      typeof summary.probability === "number"
-        ? " " +
-          localize(this.hass, "nowcast.chance", "{probability}", String(summary.probability)).replace(
-            "{type}",
-            typeName.toLowerCase()
-          )
-        : "";
     if (summary.precipitating) {
-      const base =
-        summary.endsInMinutes === null
-          ? typeName
-          : localize(this.hass, "nowcast.ends_in", "{type}", typeName).replace(
-              "{minutes}",
-              String(summary.endsInMinutes)
-            );
-      return base + chance;
+      return summary.endsInMinutes === null
+        ? typeName
+        : localize(this.hass, "nowcast.ends_in", "{type}", typeName).replace(
+            "{minutes}",
+            String(summary.endsInMinutes)
+          );
     }
-    return (
-      localize(this.hass, "nowcast.starts_in", "{type}", typeName).replace(
-        "{minutes}",
-        String(summary.startsInMinutes ?? 0)
-      ) + chance
+    return localize(this.hass, "nowcast.starts_in", "{type}", typeName).replace(
+      "{minutes}",
+      String(summary.startsInMinutes ?? 0)
     );
   }
 

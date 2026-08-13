@@ -131,36 +131,9 @@ export interface NowcastSummary {
   endsInMinutes: number | null;
   /** Dominant type of the relevant wet stretch (RAIN/SNOW/HAIL). */
   type: string | null;
-  /** Peak probability (%) across the relevant wet run, when reported. */
-  probability: number | null;
   /** True when every entry is dry. */
   allDry: boolean;
 }
-
-/** Highest reported probability among the contiguous wet run starting at
- * `firstStart` — the number a "chance of rain" clause should quote. */
-const runPeakProbability = (
-  entries: NowcastEntry[],
-  firstStart: Date
-): number | null => {
-  let peak: number | null = null;
-  let inRun = false;
-  for (const entry of entries) {
-    const start = new Date(entry.datetime);
-    if (start < firstStart) {
-      continue;
-    }
-    if (entry.precipitation > 0) {
-      inRun = true;
-      if (typeof entry.probability === "number") {
-        peak = peak === null ? entry.probability : Math.max(peak, entry.probability);
-      }
-    } else if (inRun) {
-      break;
-    }
-  }
-  return peak;
-};
 
 /** Derive the headline (starting/ending/none) from normalized entries. */
 export const summarizeNowcast = (
@@ -174,7 +147,6 @@ export const summarizeNowcast = (
       startsInMinutes: null,
       endsInMinutes: null,
       type: null,
-      probability: null,
       allDry: true,
     };
   }
@@ -206,7 +178,6 @@ export const summarizeNowcast = (
           ? Math.floor((end.getTime() - now.getTime()) / 60000)
           : null,
       type,
-      probability: runPeakProbability(entries, firstStart),
       allDry: false,
     };
   }
@@ -219,7 +190,6 @@ export const summarizeNowcast = (
     ),
     endsInMinutes: null,
     type,
-    probability: runPeakProbability(entries, firstStart),
     allDry: false,
   };
 };

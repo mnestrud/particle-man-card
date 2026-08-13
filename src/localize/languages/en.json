@@ -11,8 +11,7 @@
       "SNOW": "Snow",
       "HAIL": "Hail",
       "NONE": "Precipitation"
-    },
-    "chance": "({probability}% chance of {type})"
+    }
   },
   "alerts": {
     "title": "Weather Alerts",
