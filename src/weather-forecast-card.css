@@ -1205,7 +1205,10 @@ button.pmc-footer {
   border-radius: 50%;
   background: var(--card-background-color);
   border: 1px solid var(--divider-color);
-  margin-right: -20px;
+  /* Cancel the badge's full layout footprint: its width AND the flex
+   * column-gap inserted after it — otherwise every band cell shifts right
+   * by one gap+badge and desynchronizes from the chart columns. */
+  margin-right: calc(-18px - var(--forecast-item-gap));
   flex-shrink: 0;
   pointer-events: none;
 }
@@ -1237,3 +1240,12 @@ button.pmc-footer {
 }
 
 
+
+/* Wind direction beside the wind-speed value: arrow points where the wind
+ * blows (bearing + 180, since wind_bearing is the origin direction). */
+.wfc-wind-direction-arrow {
+  --mdc-icon-size: 13px;
+  color: var(--secondary-text-color);
+  display: inline-flex;
+  vertical-align: middle;
+}

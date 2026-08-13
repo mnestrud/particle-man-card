@@ -132,6 +132,19 @@ export class WfcCurrentWeatherAttributes extends LitElement {
 
     const label = this.resolveLabel(attribute, explicitLabel, customEntity);
 
+    const bearing =
+      attribute === "wind_speed" && !customEntityId
+        ? this.weatherEntity.attributes.wind_bearing
+        : undefined;
+    const windArrow =
+      typeof bearing === "number"
+        ? html`<ha-icon
+            class="wfc-wind-direction-arrow"
+            icon="mdi:navigation"
+            style="transform: rotate(${(bearing + 180) % 360}deg)"
+          ></ha-icon>`
+        : nothing;
+
     return html`
       <div
         class="wfc-current-attribute"
@@ -144,6 +157,7 @@ export class WfcCurrentWeatherAttributes extends LitElement {
           ? nothing
           : html`<span class="wfc-current-attribute-name">${label}</span>`}
         <span class="wfc-current-attribute-value">${value}</span>
+        ${windArrow}
       </div>
     `;
   }

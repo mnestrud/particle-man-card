@@ -124,6 +124,7 @@ export class WfcForecastChart extends LitElement {
   @state() private _bandTip: { label: string; x: number; y: number } | null =
     null;
   private _bandTipTimer?: number;
+  private _bandTouchStart?: { x: number; y: number };
   @state() private _selectedAttribute: ChartAttributes =
     DEFAULT_CHART_ATTRIBUTE;
 
@@ -313,7 +314,11 @@ export class WfcForecastChart extends LitElement {
                           title=${cell.label ?? ""}
                           aria-label=${cell.label ?? ""}
                           @click=${(ev: MouseEvent) =>
-                            this.showBandTip(ev, cell.label)}
+                            this.showBandTipAt(ev.clientX, ev.clientY, cell.label)}
+                          @touchstart=${(ev: TouchEvent) =>
+                            this.onBandTouchStart(ev)}
+                          @touchend=${(ev: TouchEvent) =>
+                            this.onBandTouchEnd(ev, cell.label)}
                           style=${styleMap({
                             "--row-color": cell.color ?? "transparent",
                           })}
@@ -341,18 +346,44 @@ export class WfcForecastChart extends LitElement {
   }
 
   /**
-   * Tap-to-tooltip for the band cells: native `title` is hover-only, so a
-   * tap shows a short-lived floating bubble at the touch point instead.
+   * Tap-to-tooltip for the band cells. Native `title` is hover-only, and the
+   * scroll container's action handler preventDefaults every touchend (killing
+   * synthetic clicks), so touch is handled directly on the cell — with a
+   * movement guard so scroll drags ending on a cell don't pop the bubble.
    */
-  private showBandTip(ev: MouseEvent, label: string | null): void {
+  private showBandTipAt(x: number, y: number, label: string | null): void {
     if (!label) {
       return;
     }
     window.clearTimeout(this._bandTipTimer);
-    this._bandTip = { label, x: ev.clientX, y: ev.clientY };
+    this._bandTip = { label, x, y };
     this._bandTipTimer = window.setTimeout(() => {
       this._bandTip = null;
     }, 3500);
+  }
+
+  private onBandTouchStart(ev: TouchEvent): void {
+    const touch = ev.touches[0];
+    this._bandTouchStart = touch
+      ? { x: touch.clientX, y: touch.clientY }
+      : undefined;
+  }
+
+  private onBandTouchEnd(ev: TouchEvent, label: string | null): void {
+    const start = this._bandTouchStart;
+    this._bandTouchStart = undefined;
+    const touch = ev.changedTouches[0];
+    if (!start || !touch) {
+      return;
+    }
+    const moved =
+      Math.abs(touch.clientX - start.x) + Math.abs(touch.clientY - start.y);
+    if (moved > 10) {
+      return; // was a scroll drag, not a tap
+    }
+    // Suppress the follow-up synthetic click so the tip doesn't double-fire.
+    ev.preventDefault();
+    this.showBandTipAt(touch.clientX, touch.clientY, label);
   }
 
   private initChart(): void {
