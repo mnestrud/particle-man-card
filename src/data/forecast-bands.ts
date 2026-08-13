@@ -1,6 +1,7 @@
 import { HomeAssistant } from "custom-card-helpers";
 import { DiscoveryResult } from "./entity-discovery";
 import { classifyAirQuality, classifyPollen } from "./panel-entities";
+import { localize } from "../localize/localize";
 import { ForecastAttribute } from "./weather";
 
 /**
@@ -31,6 +32,7 @@ interface SeriesEntry {
   category?: string | null;
   index?: number | null;
   dominant_pollutant?: string | null;
+  below_action_level?: boolean | null;
 }
 
 const hourKey = (iso: string | undefined): number | null => {
@@ -116,7 +118,7 @@ export const buildForecastBands = (
           return { color: null, label: null };
         }
         const parts = [
-          typeof entry.aqi === "number" ? `AQI ${entry.aqi}` : null,
+          typeof entry.aqi === "number" ? `UAQI ${entry.aqi}` : null,
           entry.category ?? null,
           entry.dominant_pollutant
             ? entry.dominant_pollutant.toUpperCase()
@@ -140,7 +142,13 @@ export const buildForecastBands = (
     const { types } = classifyPollen(hass, pollenEntities);
     const byDay = new Map<
       string,
-      { name: string; severity: number; color: string | null; index: number | null; category: string | null }[]
+      {
+        name: string;
+        severity: number;
+        color: string | null;
+        category: string | null;
+        belowActionLevel: boolean | null;
+      }[]
     >();
     for (const type of types) {
       const attrs = type.state.attributes as Record<string, unknown>;
@@ -160,8 +168,11 @@ export const buildForecastBands = (
           name,
           severity,
           color: typeof entry.color_hex === "string" ? entry.color_hex : null,
-          index: typeof entry.index === "number" ? entry.index : null,
           category: entry.category ?? null,
+          belowActionLevel:
+            typeof entry.below_action_level === "boolean"
+              ? entry.below_action_level
+              : null,
         });
         byDay.set(key, list);
       }
@@ -174,13 +185,12 @@ export const buildForecastBands = (
           return { color: null, label: null };
         }
         const sorted = [...list].sort((a, b) => b.severity - a.severity);
-        const breakdown = sorted
-          .map((t) =>
-            [t.name, t.index !== null ? String(t.index) : null, t.category]
-              .filter(Boolean)
-              .join(" ")
-          )
-          .join(" · ");
+        const acting = sorted.filter((t) => t.belowActionLevel !== true);
+        const breakdown = acting.length
+          ? acting
+              .map((t) => [t.name, t.category].filter(Boolean).join(" "))
+              .join(" · ")
+          : `${localize(hass, "pollen.title")} ${localize(hass, "panel.all_quiet")}`;
         return {
           color: sorted[0]!.color,
           label: `${slotTime(hass, slot.datetime, granularity)} — ${breakdown}`,
