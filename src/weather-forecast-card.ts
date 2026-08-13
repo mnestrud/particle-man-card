@@ -289,11 +289,15 @@ export class WeatherForecastCard extends LitElement {
    * slightly generous estimate only adds whitespace rather than clipping.
    */
   public getGridOptions(): LovelaceGridOptions {
-    const { rows, minRows, minColumns } = this.computeRowSizing();
+    const { minRows, minColumns } = this.computeRowSizing();
 
+    // rows: "auto" — the sections grid sizes the cell to the card's content
+    // and reflows live. Essential here: the quiet-row footers, plant details
+    // and health toggles grow the card at runtime, and any fixed row count
+    // would clip or spill on expansion.
     return {
       columns: 12,
-      rows,
+      rows: "auto",
       min_rows: minRows,
       min_columns: minColumns,
     };
